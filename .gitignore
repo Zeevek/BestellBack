@@ -1,0 +1,19 @@
+# --- Données personnelles : ne JAMAIS envoyer sur un dépôt public ---
+# Le fichier de sauvegarde contient les noms, adresses et téléphones des clients.
+data/*.json
+*.json
+!manifest.webmanifest
+!package.json
+
+# Sauvegardes exportées par l'application
+Sauvegarde-ALaTentation-*.json
+donnees-historique.json
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.vscode/
+.idea/

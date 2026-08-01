@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="BestellBack — gestion des commandes, caisse et fabrication pour la pâtisserie À la Tentation (Nevers). Fonctionne hors ligne.">
+<meta name="theme-color" content="#2c1a10">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-touch-icon-120.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BestellBack">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="BestellBack">
+<meta name="msapplication-TileColor" content="#2c1a10">
+<meta name="msapplication-TileImage" content="./icons/icon-192.png">
+<title>BestellBack — À la Tentation</title>
+<style>
+  /* ---- Identité « pâtisserie-chocolaterie » : chocolat, crème, caramel ---- */
+  :root{
+    --choco:#2c1a10; --choco2:#3f2415; --praline:#7a4f33; --caramel:#bd7a2c;
+    --caramel-d:#a4651d; --cream:#f7f0e3; --paper:#fbf6ec; --line:#e6dac4;
+    --ink:#2c1a10; --muted:#8a7558; --ok:#3f7a4f; --okbg:#e7f1e8;
+    --danger:#a63a2a; --dangerbg:#f6e6e2; --shadow:0 1px 2px rgba(44,26,16,.08),0 6px 18px rgba(44,26,16,.07);
+    --rad:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--cream); font-size:16px; line-height:1.45;
+  }
+  .serif{font-family:Georgia,"Iowan Old Style","Palatino Linotype",Cambria,serif}
+  h1,h2,h3{font-family:Georgia,"Iowan Old Style",Cambria,serif;font-weight:600;letter-spacing:.2px}
+  button{font:inherit;cursor:pointer}
+  input,select,textarea{font:inherit;color:var(--ink)}
+  a{color:var(--caramel-d)}
+
+  /* ---- Barre supérieure ---- */
+  header.top{
+    background:linear-gradient(180deg,var(--choco2),var(--choco));
+    color:var(--cream); padding:0 18px; position:sticky; top:0; z-index:30;
+    box-shadow:0 2px 14px rgba(44,26,16,.25)
+  }
+  .top-row{display:flex;align-items:center;gap:18px;height:64px;max-width:1180px;margin:0 auto}
+  .brand{display:flex;flex-direction:column;line-height:1.05}
+  .brand .name{font-family:Georgia,serif;font-size:22px;color:#fff}
+  .brand .sub{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--caramel)}
+  nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  nav.tabs button{
+    background:transparent;border:0;color:#e9dcc7;padding:9px 15px;border-radius:9px;
+    font-size:15px;opacity:.85
+  }
+  nav.tabs button:hover{background:rgba(255,255,255,.08);opacity:1}
+  nav.tabs button.active{background:var(--caramel);color:#2c1a10;font-weight:600;opacity:1}
+
+  main{max-width:1180px;margin:22px auto;padding:0 18px 80px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--shadow)}
+  .pad{padding:18px 20px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .grow{flex:1 1 auto;min-width:0}
+  .muted{color:var(--muted)}
+  .right{text-align:right}
+  .nowrap{white-space:nowrap}
+
+  /* ---- Boutons ---- */
+  .btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px;color:var(--choco);box-shadow:var(--shadow)}
+  .btn:hover{border-color:var(--caramel)}
+  .btn.primary{background:var(--caramel);border-color:var(--caramel-d);color:#2c1a10;font-weight:600}
+  .btn.primary:hover{background:var(--caramel-d);color:#fff}
+  .btn.ghost{background:transparent;border-color:transparent;box-shadow:none}
+  .btn.danger{color:var(--danger);border-color:var(--dangerbg)}
+  .btn.danger:hover{background:var(--dangerbg)}
+  .btn.sm{padding:6px 10px;font-size:14px}
+  .btn.big{padding:13px 22px;font-size:17px}
+
+  /* ---- Champs ---- */
+  label.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:600}
+  input[type=text],input[type=search],input[type=number],input[type=date],input[type=time],select,textarea{
+    background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:15px;color:var(--ink)
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--caramel);outline-offset:1px;border-color:var(--caramel)}
+  .search{position:relative}
+  .search input{width:100%;padding-left:38px}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+
+  /* ---- Tableaux ---- */
+  table{width:100%;border-collapse:collapse}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:2px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#fff8ec}
+  .chip{display:inline-block;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--praline)}
+  .chip.soon{background:var(--okbg);border-color:#cfe3d1;color:var(--ok)}
+  .chip.due{background:var(--dangerbg);border-color:#e8c9c2;color:var(--danger)}
+  .catchip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:14px;color:var(--praline);cursor:pointer}
+  .catchip:hover{border-color:var(--caramel)}
+  .catchip.on{background:var(--caramel);border-color:var(--caramel-d);color:#2c1a10;font-weight:600}
+
+  /* ---- Stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  .stat{padding:16px 18px}
+  .stat .n{font-family:Georgia,serif;font-size:30px;color:var(--choco)}
+  .stat .l{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+
+  /* ---- Modale / panneau ---- */
+  .overlay{position:fixed;inset:0;background:rgba(44,26,16,.45);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:30px 16px;overflow:auto}
+  .overlay.open{display:flex}
+  .panel{background:var(--paper);width:min(820px,100%);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
+  .panel-head{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--line);background:#fff}
+  .panel-head h2{margin:0;font-size:20px}
+  .panel-body{padding:22px;max-height:70vh;overflow:auto}
+  .panel-foot{display:flex;gap:10px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line);background:#fff;flex-wrap:wrap}
+  .x{margin-left:auto;background:transparent;border:0;font-size:24px;color:var(--muted);line-height:1}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+
+  /* ---- Toast ---- */
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--choco);color:#fff;padding:12px 20px;border-radius:12px;box-shadow:var(--shadow);z-index:80;transition:transform .25s;max-width:90vw}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  #toast.err{background:var(--danger)}
+
+  .empty{text-align:center;color:var(--muted);padding:48px 20px}
+  .empty .big{font-size:18px;color:var(--praline);margin-bottom:6px}
+
+  /* ---- Écran d'accueil / import ---- */
+  .gate{max-width:640px;margin:8vh auto;text-align:center}
+  .gate .logo{font-family:Georgia,serif;font-size:40px;color:var(--choco)}
+  .gate .logo small{display:block;font-size:13px;letter-spacing:4px;color:var(--caramel);text-transform:uppercase;margin-top:4px}
+  .drop{margin-top:26px;border:2px dashed var(--line);border-radius:18px;padding:38px 24px;background:var(--paper)}
+  .pulse{animation:pl 1.4s infinite}
+  @keyframes pl{0%,100%{opacity:1}50%{opacity:.5}}
+
+  /* ---- Ligne d'article (saisie commande) ---- */
+  .lignes th,.lignes td{padding:8px 8px}
+  .lignes input[type=number]{width:78px;text-align:right}
+  .ttot{font-family:Georgia,serif;font-size:26px;color:var(--choco)}
+
+  /* ---- Impression ---- */
+  @media print{
+    @page{ size:A4; margin:0 }
+    body{background:#fff}
+    body.modal-open main{display:none!important}
+    header.top,nav.tabs,.no-print,#toast{display:none!important}
+    .overlay.open{position:static;background:#fff;padding:0;display:block}
+    .panel{box-shadow:none;width:100%;border-radius:0}
+    .panel-head,.panel-foot{display:none}
+    .panel-body{max-height:none;overflow:visible;padding:14mm}
+    body.printing-labels .panel-body{padding:0}
+    .sheet{break-after:page;page-break-after:always}
+    .sheet:last-child{break-after:auto;page-break-after:auto}
+  }
+  /* Étiquettes 24/A4 — Agipa 119015 : 70 × 37 mm, 3 colonnes × 8 lignes, jointives */
+  .labelsheet{width:210mm;margin:0 auto}
+  .sheet{display:grid;grid-template-columns:repeat(3,70mm);grid-auto-rows:37.125mm;width:210mm}
+  .label{box-sizing:border-box;width:70mm;height:37.125mm;padding:3mm 4mm;overflow:hidden;font-family:Georgia,serif;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .label.empty{visibility:hidden}
+  .label .lnom{font-weight:700;font-size:13.5pt;line-height:1.12}
+  .label .lcat{font-size:9.5pt;font-style:italic;color:#444;margin-top:.4mm}
+  .label .lmeta{font-size:10.5pt;color:#1a1109;margin-top:.8mm;font-weight:600}
+  .label .litems{font-size:10pt;color:#111;margin-top:1.3mm;line-height:1.2}
+  @media screen{ .labelsheet{background:#fff;padding:6mm;border:1px solid var(--line);border-radius:8px}
+    .sheet{outline:0} .label{outline:1px solid #eee} }
+  .print-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .bon{font-family:Georgia,serif;color:#1a1109}
+  .bon .bhead{display:flex;justify-content:space-between;border-bottom:3px double var(--praline);padding-bottom:10px;margin-bottom:14px}
+  .bon h2{margin:0}
+  .bon table{margin-top:10px}
+  .bon th,.bon td{border-bottom:1px solid #d9c9a9}
+</style>
+</head>
+<body>
+
+<!-- ====================== ÉCRAN D'IMPORT (premier lancement) ====================== -->
+<section id="gate" class="gate" style="display:none">
+  <div class="logo">BestellBack<small>À la Tentation · Pâtissier · Chocolatier · Glacier</small></div>
+  <p class="muted" style="margin-top:18px">Bienvenue dans BestellBack, votre gestion des commandes.<br>
+  Pour démarrer, importez une fois votre fichier de sauvegarde (<b>.json</b>).</p>
+  <div class="drop">
+    <p style="margin:0 0 16px"><b>Importer l'historique</b></p>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <button class="btn primary big" onclick="document.getElementById('importFile').click()">Choisir le fichier…</button>
+    <p id="importStatus" class="muted" style="margin-top:18px"></p>
+  </div>
+  <p class="muted" style="margin-top:22px;font-size:13px">Une fois importées, les données restent enregistrées sur cet ordinateur.
+  Vous pourrez à tout moment faire une <b>sauvegarde</b> de secours.</p>
+</section>
+
+<!-- ====================== APPLICATION ====================== -->
+<div id="app" style="display:none">
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <span class="name">BestellBack</span>
+      <span class="sub">À la Tentation — gestion des commandes</span>
+    </div>
+    <nav class="tabs" id="nav">
+      <button data-view="dash" class="active">Tableau de bord</button>
+      <button data-view="commandes">Commandes</button>
+      <button data-view="caisse">Caisse</button>
+      <button data-view="facturation">Facturation</button>
+      <button data-view="impressions">Impressions</button>
+      <button data-view="clients">Clients</button>
+      <button data-view="produits">Produits</button>
+      <button data-view="sauvegarde">Sauvegarde</button>
+    </nav>
+  </div>
+</header>
+<main id="main"></main>
+</div>
+
+<div class="overlay" id="overlay"><div class="panel" id="panel"></div></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =================================================================
+   À LA TENTATION — application locale (IndexedDB, hors-ligne)
+   Aucune connexion internet requise. Données stockées dans le navigateur.
+   ================================================================= */
+
+const DB_NAME="ALaTentation", DB_VER=3;
+// Tables du fichier source -> magasins IndexedDB
+const STORE_MAP={
+  Client:"clients", Produit:"produits", Categorie:"categories", Commande:"commandes",
+  DetailCommande:"lignes", Paiement:"paiements", Banque:"banques", ModePaiement:"modes",
+  Titre:"titres", Code:"codes", Employe:"employes", Installation:"installation"
+};
+const KEYPATH={
+  clients:"RéfClient", produits:"RéfProduit", categories:"RéfCatégorie", commandes:"RéfCommande",
+  lignes:"RéfDétailCommande", paiements:"RéfPaiement", banques:"RéfBanque", modes:"RéfModePaiement",
+  titres:"RéfTitre", codes:"RéfCode", employes:"RéfEmployé", installation:"RéfInstallation"
+};
+const ALL_STORES=Object.values(STORE_MAP);
+
+let DB=null;
+let CACHE={}; // données chargées en mémoire pour affichage rapide
+let SHOP={NomSociété:"À la Tentation",Adresse:"24 Rue de Nièvre",Ville:"NEVERS",CodePostal:"58000",NuméroTél:"0386610328",Activité:"Pâtissier · Chocolatier · Glacier"};
+
+/* ---------- IndexedDB : ouverture ---------- */
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,DB_VER);
+    r.onupgradeneeded=e=>{
+      const db=e.target.result;
+      for(const s of ALL_STORES){
+        if(!db.objectStoreNames.contains(s))
+          db.createObjectStore(s,{keyPath:KEYPATH[s]});
+      }
+      if(!db.objectStoreNames.contains("meta")) db.createObjectStore("meta",{keyPath:"k"});
+      if(!db.objectStoreNames.contains("_autres")) db.createObjectStore("_autres",{keyPath:"_t"});
+      if(!db.objectStoreNames.contains("documents")) db.createObjectStore("documents",{keyPath:"id"});
+      if(!db.objectStoreNames.contains("commentaires")) db.createObjectStore("commentaires",{keyPath:"RéfCatégorie"});
+    };
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=e=>rej(e.target.error);
+  });
+}
+function tx(stores,mode="readonly"){return DB.transaction(stores,mode);}
+function putAll(store,rows){
+  return new Promise((res,rej)=>{
+    const t=tx([store],"readwrite"); const os=t.objectStore(store);
+    rows.forEach(r=>{ try{os.put(r);}catch(e){} });
+    t.oncomplete=()=>res(); t.onerror=()=>rej(t.error);
+  });
+}
+function getAll(store){
+  return new Promise((res,rej)=>{
+    if(!DB.objectStoreNames.contains(store)) return res([]);
+    const req=tx([store]).objectStore(store).getAll();
+    req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
+  });
+}
+function putOne(store,row){return new Promise((res,rej)=>{const t=tx([store],"readwrite");t.objectStore(store).put(row);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+function clearStore(store){return new Promise((res,rej)=>{if(!DB.objectStoreNames.contains(store))return res();const t=tx([store],"readwrite");t.objectStore(store).clear();t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+function delOne(store,key){return new Promise((res,rej)=>{const t=tx([store],"readwrite");t.objectStore(store).delete(key);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+function getMeta(k){return new Promise(r=>{const req=tx(["meta"]).objectStore("meta").get(k);req.onsuccess=()=>r(req.result?req.result.v:null);req.onerror=()=>r(null);});}
+function setMeta(k,v){return putOne("meta",{k,v});}
+
+/* ---------- Chargement en cache ---------- */
+async function loadCache(){
+  for(const s of ALL_STORES) CACHE[s]=await getAll(s);
+  CACHE.documents=await getAll("documents");
+  CACHE.commentaires=await getAll("commentaires");
+  if(CACHE.installation && CACHE.installation[0]) SHOP=Object.assign({},SHOP,CACHE.installation[0]);
+  // index pratiques
+  CACHE._catById={}; (CACHE.categories||[]).forEach(c=>CACHE._catById[c["RéfCatégorie"]]=c);
+  CACHE._prodById={}; (CACHE.produits||[]).forEach(p=>CACHE._prodById[p["RéfProduit"]]=p);
+  CACHE._cliById={}; (CACHE.clients||[]).forEach(c=>CACHE._cliById[c["RéfClient"]]=c);
+  CACHE._cmdById={}; (CACHE.commandes||[]).forEach(c=>CACHE._cmdById[c["RéfCommande"]]=c);
+  CACHE._lignesByCmd={}; (CACHE.lignes||[]).forEach(l=>{const k=l["RéfCommande"];(CACHE._lignesByCmd[k]=CACHE._lignesByCmd[k]||[]).push(l);});
+  CACHE._payByCmd={}; (CACHE.paiements||[]).forEach(p=>{const k=p["RéfCommande"];(CACHE._payByCmd[k]=CACHE._payByCmd[k]||[]).push(p);});
+  CACHE._modeById={}; (CACHE.modes||[]).forEach(m=>CACHE._modeById[m["RéfModePaiement"]]=m);
+  CACHE._comByCat={}; (CACHE.commentaires||[]).forEach(r=>{CACHE._comByCat[r["RéfCatégorie"]]=r.items||[];});
+}
+function nextId(store,key){
+  let mx=0; (CACHE[store]||[]).forEach(r=>{const v=r[key]; if(typeof v==="number"&&v>mx)mx=v;});
+  return mx+1;
+}
+
+/* ---------- Utilitaires ---------- */
+const eur=n=>(Number(n)||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function frDate(iso){ if(!iso)return ""; const d=new Date(iso); if(isNaN(d))return iso;
+  return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"}); }
+function todayISO(){return new Date().toISOString().slice(0,10);}
+function heure(h){ if(!h)return""; h=String(h).padStart(4,"0"); return h.length>=4?h.slice(0,2)+"h"+h.slice(2,4):h; }
+function clientNom(c){ if(!c)return"(client inconnu)"; return [c["NomSociété"],c["PrénomContact"]].filter(Boolean).join(" ")||("Client n°"+c["RéfClient"]); }
+function ligneNom(l){ const p=CACHE._prodById[l["RéfProduit"]]; if(p)return p["NomProduit"]; return l["Libelle"]||"Produit(s) supplémentaire(s)"; }
+function allComments(){ const s=new Set(); (CACHE.lignes||[]).forEach(l=>{const c=(l["Commentaire"]||"").trim(); if(c)s.add(c);}); if(typeof draft!=="undefined"&&draft&&draft.lignes)draft.lignes.forEach(l=>{const c=(l.com||"").trim(); if(c)s.add(c);}); return [...s].sort((a,b)=>a.localeCompare(b,"fr")); }
+function comList(catRef){ return (CACHE._comByCat&&CACHE._comByCat[catRef])?CACHE._comByCat[catRef]:[]; }
+async function addComToLib(catRef,text){
+  text=(text||"").trim(); if(!text)return;
+  if(catRef==null)catRef=0;
+  let rec=(CACHE.commentaires||[]).find(r=>r["RéfCatégorie"]===catRef);
+  if(!rec){ rec={"RéfCatégorie":catRef,items:[]}; (CACHE.commentaires=CACHE.commentaires||[]).push(rec); }
+  if(!rec.items.includes(text)){ rec.items.push(text); rec.items.sort((a,b)=>a.localeCompare(b,"fr")); CACHE._comByCat[catRef]=rec.items; await putOne("commentaires",rec); }
+}
+async function removeComFromLib(catRef,text){
+  const rec=(CACHE.commentaires||[]).find(r=>r["RéfCatégorie"]===catRef); if(!rec)return;
+  rec.items=(rec.items||[]).filter(x=>x!==text); CACHE._comByCat[catRef]=rec.items; await putOne("commentaires",rec);
+}
+function cmdTotal(refCmd){ const ls=CACHE._lignesByCmd[refCmd]||[]; return ls.reduce((s,l)=>s+(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0)*(1-(Number(l["Remise"])||0)),0); }
+function cmdPaye(refCmd){ const ps=CACHE._payByCmd[refCmd]||[]; return ps.reduce((s,p)=>s+(Number(p["MontantPaiement"])||0),0); }
+function cmdReste(refCmd){ const c=CACHE._cmdById[refCmd]; if(c&&c["Soldee"])return 0; const remise=Number(c&&c["Remise"])||0; return Math.round((cmdTotal(refCmd)-remise-cmdPaye(refCmd))*100)/100; }
+function statutChip(ref){
+  const paye=cmdPaye(ref), reste=cmdReste(ref);
+  if(reste<=0.005) return `<span class="chip soon">Payée</span>`;
+  if(paye>0.005) return `<span class="chip">Acompte ${eur(paye)} · reste ${eur(reste)}</span>`;
+  return `<span class="chip due">Non payée</span>`;
+}
+function paysOf(ref){ return (CACHE._payByCmd[ref]||[]).slice().sort((a,b)=>String(b["DatePaiement"]||"").localeCompare(String(a["DatePaiement"]||""))||(b["RéfPaiement"]||0)-(a["RéfPaiement"]||0)); }
+function payDetail(ref){ // ex: "20€ Espèce · 50€ CB"
+  return paysOf(ref).map(p=>`${eur(p["MontantPaiement"])} ${esc(payLabel(p))}`).join(" · ");
+}
+function pagerBar(page,pages,handler){
+  if(pages<=1)return "";
+  return `<div class="pad" style="display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)">
+    <button class="btn sm" ${page<=1?'disabled':''} onclick="${handler}(${page-1})">‹ Précédent</button>
+    <span class="muted grow" style="text-align:center">Page ${page} / ${pages}</span>
+    <button class="btn sm" ${page>=pages?'disabled':''} onclick="${handler}(${page+1})">Suivant ›</button>
+  </div>`;
+}
+function modeNom(ref){ const m=CACHE._modeById[ref]; return m?m["ModePaiement"]:""; }
+function tvaBreakdown(refCmd){ // regroupe le TTC par taux de TVA -> {taux:{ttc,ht,tva}}
+  const ls=CACHE._lignesByCmd[refCmd]||[]; const g={};
+  ls.forEach(l=>{ const p=CACHE._prodById[l["RéfProduit"]];
+    let taux=(p&&p["TVA"]!=null)?Number(p["TVA"]):5.5;
+    const ttc=(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0)*(1-(Number(l["Remise"])||0));
+    const ht=ttc/(1+taux/100);
+    g[taux]=g[taux]||{ttc:0,ht:0,tva:0}; g[taux].ttc+=ttc; g[taux].ht+=ht; g[taux].tva+=(ttc-ht);
+  });
+  return g;
+}
+function docNumero(type){ // FAC-2026-001 / DEV-2026-001
+  const an=new Date().getFullYear(); const pref=type==="devis"?"DEV":"FAC";
+  const n=(CACHE.documents||[]).filter(d=>d.type===type&&d.num&&d.num.includes("-"+an+"-")).length+1;
+  return pref+"-"+an+"-"+String(n).padStart(3,"0");
+}
+const RECENT_DAYS=90;
+function isRecent(livISO){ if(!livISO)return false; const d=new Date(livISO.slice(0,10)); if(isNaN(d))return false;
+  return (Date.now()-d.getTime())/86400000 <= RECENT_DAYS; }
+function toast(msg,err){ const t=document.getElementById("toast"); t.textContent=msg; t.className="show"+(err?" err":""); clearTimeout(t._t); t._t=setTimeout(()=>t.className="",2600); }
+
+/* ---------- Modale ---------- */
+function modal(title,bodyHTML,footHTML){
+  const p=document.getElementById("panel");
+  p.innerHTML=`<div class="panel-head"><h2>${esc(title)}</h2><button class="x no-print" onclick="closeModal()">×</button></div>
+    <div class="panel-body">${bodyHTML}</div>
+    <div class="panel-foot no-print">${footHTML||'<button class="btn" onclick="closeModal()">Fermer</button>'}</div>`;
+  document.getElementById("overlay").classList.add("open");
+  document.body.classList.add("modal-open");
+}
+function closeModal(){document.getElementById("overlay").classList.remove("open");document.body.classList.remove("modal-open","printing-labels");}
+
+/* ---------- Aide contextuelle ---------- */
+const HELP={
+ dash:{t:"Aide — Tableau de bord",h:`<p>C'est l'écran d'accueil. Il donne un aperçu rapide.</p>
+   <ul><li><b>Les compteurs</b> en haut : nombre de commandes, de clients, de produits, et de commandes à venir.</li>
+   <li><b>Commandes à venir</b> : les prochaines livraisons, triées par date. Cliquez sur une ligne pour ouvrir la commande.</li>
+   <li><b>+ Nouvelle commande</b> : pour saisir une commande tout de suite.</li>
+   <li><b>Vente directe</b> : pour une vente au comptoir, sans commande (voir l'aide de l'écran Caisse).</li></ul>
+   <p class="muted">Astuce : au tout début, « à venir » peut être vide — c'est normal, il se remplit dès que vous saisissez des commandes avec une date de livraison future.</p>`},
+ commandes:{t:"Aide — Commandes",h:`<p>Ici vous gérez toutes les commandes.</p>
+   <ul><li><b>Rechercher</b> : tapez un nom de client ou un numéro de commande.</li>
+   <li><b>À venir / Toutes</b> : filtre pour voir seulement les livraisons à venir, ou l'historique complet.</li>
+   <li><b>Ouvrir une commande</b> : cliquez sur une ligne. Vous verrez le détail, et pourrez l'encaisser, créer une facture/un devis, imprimer le bon, modifier ou supprimer.</li>
+   <li><b>+ Nouvelle commande</b> : choisissez le client (ou créez-le), la date et l'heure de livraison, puis ajoutez les produits avec quantités. Le prix se remplit automatiquement depuis le catalogue.</li>
+   <li><b>+ Produit supplémentaire</b> : pour un achat spontané ajouté à la commande, avec un libellé et un montant libres (par défaut « Produit(s) supplémentaire(s) »).</li>
+   <li><b>Commentaire</b> : sous chaque article, un champ permet de préciser une variante (ex. « sans fromage »). En cliquant dans le champ, vous retrouvez les commentaires déjà utilisés, pour réutiliser toujours la même formulation. Ces commentaires sont repris sur le bon labo (décompte séparé) et sur les étiquettes.</li>
+   <li><b>Règlement</b> : à la création, indiquez si la commande est <b>Non payée</b>, réglée par <b>Acompte</b> (avec le montant) ou <b>Payée</b> en totalité, et le moyen de paiement. Ce statut apparaît sur la liste des commandes du jour et dans la Caisse.</li></ul>`},
+ caisse:{t:"Aide — Caisse",h:`<p>L'écran se présente en deux colonnes.</p>
+   <ul><li><b>À gauche — En attente</b> : les commandes pas encore réglées. Une <b>barre de recherche</b> permet de filtrer par nom de client. Cliquez sur « Encaisser ».</li>
+   <li><b>À droite — Payées</b> : les factures réglées à la date choisie en haut (avec le moyen de paiement et le montant).</li>
+   <li><b>Encaisser</b> : le montant est pré-rempli au total. Vous pouvez saisir une <b>remise</b> (en € ou en %) ; le « net à payer » se recalcule. Choisissez le moyen de paiement (CB par défaut).</li>
+   <li><b>Paiement en deux fois</b> : indiquez un montant sur « Paiement 1 » — le reste s'inscrit automatiquement sur « Paiement 2 », où vous choisissez l'autre moyen (ex. une partie en chèque, le reste en CB).</li>
+   <li><b>+ Vente directe</b> : pour encaisser une vente au comptoir, sans commande (client « comptoir » par défaut). Ajoutez les produits (et des produits supplémentaires libres), puis encaissez. La vente apparaît ensuite dans « Payées ».</li></ul>
+   <p class="muted">En haut : la date, le total encaissé ce jour-là et le détail par moyen de paiement (pour la clôture).</p>`},
+ facturation:{t:"Aide — Facturation",h:`<p>Toutes vos factures et devis sont regroupés ici.</p>
+   <ul><li><b>Créer une facture ou un devis</b> : cela se fait depuis une commande (ouvrez-la, puis bouton « Facture » ou « Devis »). Un numéro est attribué automatiquement.</li>
+   <li><b>Retrouver un document</b> : recherchez par numéro ou nom de client, filtrez par type, puis cliquez pour le rouvrir et le réimprimer.</li></ul>
+   <p class="muted">Les factures affichent le détail de la TVA et le net à payer. Les devis portent la mention « Bon pour accord ».</p>`},
+ impressions:{t:"Aide — Impressions",h:`<p>Toutes les impressions liées à une journée, au même endroit.</p>
+   <ul><li><b>Choisissez d'abord la date</b> en haut (par défaut aujourd'hui).</li>
+   <li><b>Catégories à imprimer</b> : cliquez sur les pastilles pour n'imprimer que certaines catégories (boutons « Tout » / « Aucune » pour aller vite). Par défaut, tout est imprimé.</li>
+   <li><b>Bon de fabrication (labo)</b> : la liste de tout ce qu'il faut produire ce jour-là, quantités additionnées par produit et regroupées par catégorie.</li>
+   <li><b>Étiquettes de commande</b> : <b>une étiquette par catégorie</b> dans chaque commande (nom du client, catégorie, heure, contenu), sur planche A4 de 24 (Agipa 70 × 37 mm). Si la planche est entamée, indiquez à quelle case commencer.</li>
+   <li><b>Liste des commandes du jour</b> : récapitulatif trié par client.</li></ul>
+   <p class="muted">Chaque bouton ouvre un aperçu, puis « Imprimer ». Réglez l'imprimante sur A4, sans mise à l'échelle (100 %).</p>`},
+ clients:{t:"Aide — Clients",h:`<p>Le fichier de vos clients.</p>
+   <ul><li><b>Rechercher</b> : tapez un nom.</li>
+   <li><b>Ouvrir une fiche</b> : cliquez sur un client pour voir ses coordonnées, son total cumulé, son reste dû et l'historique de ses commandes.</li>
+   <li><b>Changer de page</b> : « ‹ Précédent » / « Suivant › » en bas de la liste pour parcourir tous les clients.</li>
+   <li><b>+ Nouveau client</b> / <b>Modifier</b> : pour créer ou corriger une fiche (nom, téléphone, adresse).</li></ul>`},
+ produits:{t:"Aide — Produits",h:`<p>Votre catalogue de produits et leurs prix.</p>
+   <ul><li><b>Rechercher / filtrer</b> par nom ou par catégorie.</li>
+   <li><b>Changer de page</b> : utilisez « ‹ Précédent » et « Suivant › » en bas de la liste pour parcourir tout le catalogue.</li>
+   <li><b>Ouvrir un produit</b> : cliquez pour modifier son nom, sa catégorie, son prix, sa TVA et son descriptif.</li>
+   <li><b>+ Nouveau produit</b> : pour ajouter un article.</li>
+   <li><b>Catégories</b> : le bouton « Catégories » permet d'ajouter, renommer ou supprimer les familles de produits.</li>
+   <li><b>Commentaires</b> : le bouton « Commentaires » ouvre une bibliothèque de commentaires types <b>par catégorie</b> (ex. « sans fromage » pour les fours salés). Ils sont proposés automatiquement en commande, et tout nouveau commentaire saisi en commande s'ajoute tout seul à la bibliothèque de la catégorie du produit.</li></ul>
+   <p class="muted">Le prix saisi ici est proposé automatiquement lors de la prise de commande (modifiable au cas par cas).</p>`},
+ sauvegarde:{t:"Aide — Sauvegarde",h:`<p>Le plus important pour ne jamais rien perdre.</p>
+   <ul><li><b>Télécharger la sauvegarde</b> : crée un fichier de secours avec toutes vos données. À faire régulièrement, et à copier sur une clé USB.</li>
+   <li><b>Restaurer</b> : recharge les données depuis un fichier de sauvegarde (par exemple sur un nouvel ordinateur).</li></ul>
+   <p class="muted">Conseil : faites une sauvegarde au moins une fois par semaine, et avant toute manipulation importante.</p>`}
+};
+function helpBtn(view){ return `<button class="btn no-print" title="Aide de cet écran" onclick="showHelp('${view}')" style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--caramel);color:#2c1a10;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif">?</span> Aide</button>`; }
+function showHelp(view){ const x=HELP[view]||HELP.dash; modal(x.t,x.h,`<button class="btn primary" onclick="closeModal()">J'ai compris</button>`); }
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeModal();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+
+/* =================================================================
+   IMPORT INITIAL
+   ================================================================= */
+document.getElementById("importFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const st=document.getElementById("importStatus");
+  st.textContent="Lecture du fichier…"; st.className="muted pulse";
+  try{
+    const data=JSON.parse(await f.text());
+    await importData(data,st);
+    await setMeta("imported",true);
+    st.className="muted"; st.textContent="Terminé ! Ouverture…";
+    setTimeout(start,500);
+  }catch(err){ st.className="muted"; st.textContent="Erreur : "+err.message; }
+});
+
+async function importData(data,st){
+  // data peut être { Table:{lignes:[...]} } (export historique) ou { store:[...] } (sauvegarde app)
+  let total=0;
+  for(const [tname,tval] of Object.entries(data)){
+    const rows=Array.isArray(tval)?tval:(tval&&tval.lignes)?tval.lignes:null;
+    if(!rows){continue;}
+    if(tname==="documents"){ await clearStore("documents"); await putAll("documents",rows.filter(r=>r&&r.id!=null)); continue; }
+    if(tname==="commentaires"){ await clearStore("commentaires"); await putAll("commentaires",rows.filter(r=>r&&r["RéfCatégorie"]!=null)); continue; }
+    let store=STORE_MAP[tname]||(ALL_STORES.includes(tname)?tname:null);
+    if(store){
+      const kp=KEYPATH[store];
+      const clean=rows.filter(r=>r&&r[kp]!=null);
+      if(st){st.textContent=`Import : ${tname} (${clean.length})…`;}
+      await clearStore(store);
+      await putAll(store,clean);
+      total+=clean.length;
+    }else{
+      // tables non gérées : conservées telles quelles, sans perte
+      await putOne("_autres",{_t:tname,rows});
+    }
+    await new Promise(r=>setTimeout(r,0));
+  }
+  return total;
+}
+
+/* =================================================================
+   VUES
+   ================================================================= */
+let VIEW="dash";
+document.getElementById("nav").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-view]"); if(!b)return;
+  VIEW=b.dataset.view;
+  [...document.querySelectorAll("#nav button")].forEach(x=>x.classList.toggle("active",x===b));
+  render();
+});
+function render(){ ({dash:viewDash,commandes:viewCommandes,caisse:viewCaisse,facturation:viewFacturation,impressions:viewImpressions,clients:viewClients,produits:viewProduits,sauvegarde:viewSauvegarde}[VIEW]||viewDash)(); }
+
+/* ---------- Tableau de bord ---------- */
+function viewDash(){
+  const m=document.getElementById("main");
+  const today=todayISO();
+  const avenir=(CACHE.commandes||[]).filter(c=>!c["VenteDirecte"] && c["DateExpédition"]&&c["DateExpédition"].slice(0,10)>=today)
+    .sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||"")).slice(0,40);
+  m.innerHTML=`
+   <div class="row" style="align-items:flex-end;margin-bottom:18px">
+     <div class="grow"><h1 style="margin:0 0 2px">Bonjour 👋</h1>
+       <div class="muted">${esc(SHOP.NomSociété)} — ${esc(SHOP.Activité||"")}</div></div>
+     ${helpBtn('dash')}
+     <button class="btn big" onclick="venteDirecte()">Vente directe</button>
+     <button class="btn primary big" onclick="newCommande()">+ Nouvelle commande</button>
+   </div>
+   <div class="stats" style="margin-bottom:18px">
+     <div class="card stat"><div class="n">${(CACHE.commandes||[]).length.toLocaleString("fr-FR")}</div><div class="l">Commandes</div></div>
+     <div class="card stat"><div class="n">${(CACHE.clients||[]).length.toLocaleString("fr-FR")}</div><div class="l">Clients</div></div>
+     <div class="card stat"><div class="n">${(CACHE.produits||[]).length.toLocaleString("fr-FR")}</div><div class="l">Produits</div></div>
+     <div class="card stat"><div class="n">${avenir.length}</div><div class="l">Commandes à venir</div></div>
+   </div>
+   <div class="card">
+     <div class="pad" style="border-bottom:1px solid var(--line);display:flex;align-items:center">
+       <h2 style="margin:0">Commandes à venir</h2>
+       <button class="btn sm" style="margin-left:auto" onclick="document.querySelector('[data-view=commandes]').click()">Voir toutes</button>
+     </div>
+     ${avenir.length? table_commandes(avenir) :
+       `<div class="empty"><div class="big">Aucune commande à venir</div>Les prochaines livraisons s'afficheront ici.</div>`}
+   </div>`;
+}
+
+function table_commandes(list){
+  const today=todayISO();
+  return `<table><thead><tr><th>N°</th><th>Livraison</th><th>Client</th><th class="right">Articles</th><th class="right">Total</th></tr></thead><tbody>${
+    list.map(c=>{
+      const liv=c["DateExpédition"]?c["DateExpédition"].slice(0,10):"";
+      const soon=liv&&liv>=today;
+      const nbl=(CACHE._lignesByCmd[c["RéfCommande"]]||[]).length;
+      return `<tr onclick="openCommande(${c["RéfCommande"]})">
+        <td class="nowrap"><b>${c["RéfCommande"]}</b></td>
+        <td class="nowrap"><span class="chip ${soon?'soon':''}">${frDate(liv)} ${esc(heure(c["Heure"]))}</span></td>
+        <td>${esc(clientNom(CACHE._cliById[c["RéfClient"]]))}</td>
+        <td class="right">${nbl}</td>
+        <td class="right nowrap"><b>${eur(cmdTotal(c["RéfCommande"]))}</b></td></tr>`;
+    }).join("")
+  }</tbody></table>`;
+}
+
+/* ---------- Commandes ---------- */
+let cmdFilter={q:"",mode:"avenir"},cmdPage=1;const CMD_PAGE_SIZE=50;
+function viewCommandes(){
+  const m=document.getElementById("main");
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:16px">
+     <h1 style="margin:0" class="grow">Commandes</h1>
+     ${helpBtn('commandes')}
+     <button class="btn primary big" onclick="newCommande()">+ Nouvelle commande</button>
+   </div>
+   <div class="card pad" style="margin-bottom:16px">
+     <div class="row" style="align-items:center">
+       <div class="search grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+         <input id="cq" type="search" placeholder="Rechercher : nom de client ou n° de commande…" value="${esc(cmdFilter.q)}"></div>
+       <select id="cmode">
+         <option value="avenir">À venir</option>
+         <option value="all">Toutes</option>
+       </select>
+     </div>
+   </div>
+   <div class="card" id="cmdList"></div>`;
+  const cq=document.getElementById("cq"), cmode=document.getElementById("cmode");
+  cmode.value=cmdFilter.mode;
+  const run=()=>{cmdFilter.q=cq.value;cmdFilter.mode=cmode.value;cmdPage=1;renderCmdList();};
+  cq.addEventListener("input",run); cmode.addEventListener("change",run);
+  renderCmdList();
+}
+function gotoCmdPage(p){cmdPage=p;renderCmdList();}
+function renderCmdList(){
+  const today=todayISO(); const q=cmdFilter.q.trim().toLowerCase();
+  let list=(CACHE.commandes||[]).slice();
+  if(cmdFilter.mode==="avenir") list=list.filter(c=>!c["VenteDirecte"] && c["DateExpédition"]&&c["DateExpédition"].slice(0,10)>=today);
+  if(q){
+    list=list.filter(c=>{
+      if(String(c["RéfCommande"]).includes(q))return true;
+      const cl=CACHE._cliById[c["RéfClient"]];
+      return cl&&clientNom(cl).toLowerCase().includes(q);
+    });
+  }
+  list.sort((a,b)=>(b["DateExpédition"]||"").localeCompare(a["DateExpédition"]||""));
+  if(cmdFilter.mode==="avenir") list.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/CMD_PAGE_SIZE));
+  if(cmdPage>pages)cmdPage=pages; if(cmdPage<1)cmdPage=1;
+  const startI=(cmdPage-1)*CMD_PAGE_SIZE;
+  const pageItems=list.slice(startI,startI+CMD_PAGE_SIZE);
+  const el=document.getElementById("cmdList");
+  el.innerHTML= total? `<div class="pad muted" style="border-bottom:1px solid var(--line)">${total.toLocaleString("fr-FR")} commande(s) — affichées ${startI+1}–${startI+pageItems.length}</div>`+table_commandes(pageItems)+pagerBar(cmdPage,pages,"gotoCmdPage")
+    : `<div class="empty"><div class="big">Aucune commande trouvée</div>Modifiez votre recherche ou créez une nouvelle commande.</div>`;
+}
+
+function openCommande(ref){
+  const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===ref); if(!c)return;
+  window._openCmdRef=ref;
+  const cl=CACHE._cliById[c["RéfClient"]];
+  const ls=(CACHE._lignesByCmd[ref]||[]);
+  const emp=(CACHE.employes||[]).find(e=>e["RéfEmployé"]===c["RéfEmployé"]);
+  const body=`
+   <div class="grid2" style="margin-bottom:16px">
+     <div><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.6px">Client</div>
+       <div style="font-size:18px"><b>${esc(clientNom(cl))}</b></div>
+       <div class="muted">${esc(cl&&cl["AdresseFacturation"]||"")}</div>
+       <div class="muted">${esc(cl&&cl["NuméroTél"]||c["ComTél"]||"")}</div></div>
+     <div><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.6px">Livraison</div>
+       <div style="font-size:18px"><b>${frDate(c["DateExpédition"])} ${esc(heure(c["Heure"]))}</b></div>
+       <div class="muted">Commande du ${frDate(c["DateCommande"])}</div>
+       <div class="muted">${esc(emp?("Pris par "+emp["NomFamille"]):"")}</div></div>
+   </div>
+   <table><thead><tr><th>Produit</th><th class="right">Qté</th><th class="right">P.U.</th><th class="right">Total</th></tr></thead><tbody>${
+     ls.map(l=>{const p=CACHE._prodById[l["RéfProduit"]];const t=(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0)*(1-(Number(l["Remise"])||0));
+       return `<tr style="cursor:default"><td>${esc(ligneNom(l))}${l["Commentaire"]?'<div class="muted" style="font-size:13px">'+esc(l["Commentaire"])+'</div>':''}</td>
+       <td class="right">${l["Quantité"]}</td><td class="right">${eur(l["PrixUnitaires"])}</td><td class="right"><b>${eur(t)}</b></td></tr>`;}).join("")
+   }</tbody><tfoot><tr><td colspan="3" class="right"><b>Total</b></td><td class="right ttot">${eur(cmdTotal(ref))}</td></tr></tfoot></table>
+   ${(function(){const c=CACHE._cmdById[ref]||{};const remise=Number(c["Remise"])||0;const paye=cmdPaye(ref),reste=cmdReste(ref);const ps=paysOf(ref);
+     return `<div class="card pad" style="background:#fff;margin-top:14px">
+       <div class="row" style="align-items:center"><b class="grow">Règlement</b>
+         <span class="chip ${reste<=0?'soon':''}">${reste<=0?'Soldé':'Reste : '+eur(reste)}</span></div>
+       ${remise>0?`<div class="muted" style="margin-top:6px;font-size:14px">Remise : ${eur(remise)} — net : ${eur(cmdTotal(ref)-remise)}</div>`:''}
+       ${ps.length?`<div style="margin-top:8px">${ps.map(p=>`<div class="row" style="align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line)">
+           <span class="grow" style="font-size:14px">${frDate(p["DatePaiement"])} — <b>${eur(p["MontantPaiement"])}</b> · ${esc(payLabel(p))}${p["Banque"]?", "+esc(p["Banque"]):""}</span>
+           <button class="btn ghost sm" title="Supprimer cet encaissement" onclick="deletePaiement(${p["RéfPaiement"]})">✕</button>
+         </div>`).join("")}</div>`:'<div class="muted" style="margin-top:6px">Aucun encaissement.</div>'}
+     </div>`;})()}`;
+  const foot=`<button class="btn danger" onclick="deleteCommande(${ref})">Supprimer</button>
+    <button class="btn" onclick="encaisser(${ref})">Encaisser</button>
+    <button class="btn" onclick="makeDocument(${ref},'devis')">Devis</button>
+    <button class="btn" onclick="makeDocument(${ref},'facture')">Facture</button>
+    <button class="btn" onclick="printBon(${ref})">Bon</button>
+    <button class="btn primary" onclick="newCommande(${ref})">Modifier</button>`;
+  modal((c["VenteDirecte"]?"Vente directe n°":"Commande n°")+ref,body,foot);
+}
+
+async function deleteCommande(ref){
+  if(!confirm("Supprimer définitivement la commande n°"+ref+" et ses lignes ?"))return;
+  const ls=(CACHE._lignesByCmd[ref]||[]).slice();
+  for(const l of ls) await delOne("lignes",l["RéfDétailCommande"]);
+  await delOne("commandes",ref);
+  await loadCache(); closeModal(); render(); toast("Commande supprimée");
+}
+
+/* ---------- Saisie / édition d'une commande ---------- */
+let draft=null;
+function newCommande(editRef){
+  if(editRef){
+    const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===editRef);
+    draft={ref:editRef, vente:!!c["VenteDirecte"], client:c["RéfClient"], livraison:(c["DateExpédition"]||"").slice(0,10),
+      heure:(c["Heure"]||""), emp:c["RéfEmployé"]||"",
+      lignes:(CACHE._lignesByCmd[editRef]||[]).map(l=>({prod:l["RéfProduit"]||0,libelle:l["Libelle"]||"",qte:l["Quantité"]||1,pu:l["PrixUnitaires"]||0,com:l["Commentaire"]||"",ref:l["RéfDétailCommande"]}))};
+  }else{
+    draft={ref:null,vente:false,client:null,livraison:todayISO(),heure:"",emp:"",lignes:[],statut:"nonpaye",acompte:0,payMode:"cb"};
+  }
+  renderDraft();
+}
+async function ensureComptoir(){
+  let c=(CACHE.clients||[]).find(x=>(x["NomSociété"]||"").toUpperCase()==="VENTE COMPTOIR");
+  if(c)return c["RéfClient"];
+  const ref=nextId("clients","RéfClient");
+  await putOne("clients",{"RéfClient":ref,"NomSociété":"VENTE COMPTOIR"}); await loadCache();
+  return ref;
+}
+async function venteDirecte(){
+  const ref=await ensureComptoir();
+  draft={ref:null,vente:true,client:ref,livraison:todayISO(),heure:"",emp:"",lignes:[]};
+  renderDraft();
+}
+function renderDraft(){
+  const cl=draft.client?CACHE._cliById[draft.client]:null;
+  const empOpts=(CACHE.employes||[]).map(e=>`<option value="${e["RéfEmployé"]}" ${draft.emp==e["RéfEmployé"]?"selected":""}>${esc(e["NomFamille"])}</option>`).join("");
+  const vente=!!draft.vente;
+  const body=`
+   <div class="grid2" style="margin-bottom:16px">
+     <label class="fld">Client${vente?' <span class="muted" style="font-weight:400">(comptoir par défaut)</span>':''}
+       <div class="row" style="gap:8px">
+         <input id="dCli" type="text" class="grow" readonly value="${esc(cl?clientNom(cl):"")}" placeholder="Aucun client choisi" style="background:#fff">
+         <button class="btn" type="button" onclick="pickClient()">Choisir</button>
+       </div>
+     </label>
+     ${vente?`<label class="fld">Date<input id="dLiv" type="date" value="${esc(draft.livraison)}"></label>`
+     :`<div class="row">
+       <label class="fld grow">Date de livraison<input id="dLiv" type="date" value="${esc(draft.livraison)}"></label>
+       <label class="fld" style="max-width:120px">Heure<input id="dHr" type="time" value="${draft.heure?(String(draft.heure).padStart(4,'0').slice(0,2)+':'+String(draft.heure).padStart(4,'0').slice(2,4)):''}"></label>
+     </div>`}
+   </div>
+   <label class="fld" style="margin-bottom:14px">Vendeuse / prise par
+     <select id="dEmp" style="max-width:240px"><option value="">—</option>${empOpts}</select></label>
+
+   <div class="card pad" style="background:#fff;margin-bottom:14px">
+     <div class="row" style="align-items:center;margin-bottom:8px">
+       <b class="grow">Articles</b>
+       <button class="btn sm" type="button" onclick="addFreeLine()">+ Produit supplémentaire</button>
+       <button class="btn sm primary" type="button" onclick="pickProduct()">+ Ajouter un produit</button>
+     </div>
+     <table class="lignes"><thead><tr><th>Produit</th><th class="right">Qté</th><th class="right">Prix unit.</th><th class="right">Total</th><th></th></tr></thead>
+     <tbody id="dLignes"></tbody>
+     <tfoot><tr><td colspan="3" class="right"><b>Total</b></td><td class="right ttot" id="dTotal"></td><td></td></tr></tfoot></table>
+     <datalist id="commentsDL">${allComments().map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+     ${Object.keys(CACHE._comByCat||{}).map(cr=>`<datalist id="cdl_${cr}">${(CACHE._comByCat[cr]||[]).map(c=>`<option value="${esc(c)}">`).join("")}</datalist>`).join("")}
+   </div>
+   ${vente?"":(draft.ref
+     ? `<div class="card pad" style="background:#fff;margin-bottom:14px"><b>Règlement</b> ${statutChip(draft.ref)}
+         <div class="muted" style="font-size:13px;margin-top:6px">Pour encaisser ou ajouter un acompte, utilisez l'écran Caisse.</div></div>`
+     : `<div class="card pad" style="background:#fff;margin-bottom:14px">
+         <b>Règlement</b>
+         <div class="print-actions" style="margin-top:6px">
+           <button type="button" class="catchip" id="st_nonpaye" onclick="pickStatut('nonpaye')">Non payée</button>
+           <button type="button" class="catchip" id="st_acompte" onclick="pickStatut('acompte')">Acompte</button>
+           <button type="button" class="catchip" id="st_paye" onclick="pickStatut('paye')">Payée</button>
+         </div>
+         <div id="acompteWrap" style="display:none;margin-top:10px"><label class="fld" style="max-width:220px">Montant de l'acompte (€)<input id="dAcompte" type="number" step="0.01" min="0" value="${draft.acompte||""}" onchange="draft.acompte=parseFloat(this.value)||0"></label></div>
+         <div id="payModeWrap" style="display:none;margin-top:10px"><div class="fld">Moyen de paiement</div>
+           <div class="print-actions" style="margin-top:4px">
+             <button type="button" class="catchip" id="pm_cheque" onclick="pickPayMode('cheque')">Chèque</button>
+             <button type="button" class="catchip" id="pm_espece" onclick="pickPayMode('espece')">Espèce</button>
+             <button type="button" class="catchip" id="pm_cb" onclick="pickPayMode('cb')">CB</button>
+           </div></div>
+       </div>`)}`;
+  const foot= vente
+    ? `<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="saveVente()">Encaisser la vente</button>`
+    : `<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="saveCommande()">${draft.ref?"Enregistrer les modifications":"Créer la commande"}</button>`;
+  const titre= vente ? "Vente directe (comptoir)" : (draft.ref?("Modifier la commande n°"+draft.ref):"Nouvelle commande");
+  modal(titre,body,foot);
+  renderDraftLignes();
+  if(!vente && !draft.ref){ pickStatut(draft.statut||"nonpaye"); pickPayMode(draft.payMode||"cb"); }
+}
+function pickStatut(s){
+  draft.statut=s;
+  ["nonpaye","acompte","paye"].forEach(x=>{const b=document.getElementById("st_"+x); if(b)b.classList.toggle("on",x===s);});
+  const aw=document.getElementById("acompteWrap"); if(aw)aw.style.display=(s==="acompte")?"block":"none";
+  const pw=document.getElementById("payModeWrap"); if(pw)pw.style.display=(s==="acompte"||s==="paye")?"block":"none";
+}
+function pickPayMode(k){ draft.payMode=k; ["cheque","espece","cb"].forEach(x=>{const b=document.getElementById("pm_"+x); if(b)b.classList.toggle("on",x===k);}); }
+function renderDraftLignes(){
+  const tb=document.getElementById("dLignes"); if(!tb)return;
+  if(!draft.lignes.length){tb.innerHTML=`<tr><td colspan="5" class="muted" style="text-align:center;padding:18px">Aucun article. Ajoutez un produit ou un produit supplémentaire.</td></tr>`;}
+  else tb.innerHTML=draft.lignes.map((l,i)=>{
+    const p=CACHE._prodById[l.prod];
+    const t=(Number(l.qte)||0)*(Number(l.pu)||0);
+    const nameCell = p
+      ? esc(p["NomProduit"])
+      : `<input type="text" value="${esc(l.libelle||"Produit(s) supplémentaire(s)")}" onchange="updLigneText(${i},'libelle',this.value)" style="width:100%" placeholder="Libellé">`;
+    return `<tr><td>${nameCell}
+        <input list="cdl_${catRefOf(l.prod)}" value="${esc(l.com||"")}" onchange="updLigneText(${i},'com',this.value)" placeholder="Commentaire (ex. sans fromage)" style="width:100%;margin-top:4px;font-size:13px;color:var(--praline)"></td>
+      <td class="right"><input type="number" min="0" step="0.5" value="${l.qte}" onchange="updLigne(${i},'qte',this.value)"></td>
+      <td class="right"><input type="number" min="0" step="0.01" value="${l.pu}" onchange="updLigne(${i},'pu',this.value)"></td>
+      <td class="right nowrap"><b>${eur(t)}</b></td>
+      <td><button class="btn ghost sm" title="Retirer" onclick="rmLigne(${i})">✕</button></td></tr>`;
+  }).join("");
+  const tot=draft.lignes.reduce((s,l)=>s+(Number(l.qte)||0)*(Number(l.pu)||0),0);
+  document.getElementById("dTotal").textContent=eur(tot);
+}
+function addFreeLine(){ syncDraftHeader(); draft.lignes.push({prod:0,libelle:"Produit(s) supplémentaire(s)",qte:1,pu:0,com:"",ref:null}); renderDraft(); }
+function updLigneText(i,k,v){ draft.lignes[i][k]=v; if(k==="com"){const t=(v||"").trim(); if(t)addComToLib(catRefOf(draft.lignes[i].prod),t);} }
+function updLigne(i,k,v){draft.lignes[i][k]=parseFloat(v)||0;renderDraftLignes();}
+function rmLigne(i){draft.lignes.splice(i,1);renderDraftLignes();}
+function syncDraftHeader(){
+  const liv=document.getElementById("dLiv"), hr=document.getElementById("dHr"), emp=document.getElementById("dEmp");
+  if(liv)draft.livraison=liv.value;
+  if(hr)draft.heure=hr.value?hr.value.replace(":",""):"";
+  if(emp)draft.emp=emp.value;
+}
+
+/* sélecteur de client (réutilise la modale en mode liste) */
+function pickClient(){
+  syncDraftHeader();
+  const body=`<div class="search" style="margin-bottom:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+     <input id="pcq" type="search" placeholder="Nom du client…" style="width:100%;padding-left:38px" autofocus></div>
+     <div style="margin-bottom:10px"><button class="btn sm" onclick="quickNewClient()">+ Nouveau client</button></div>
+     <div id="pcList" style="max-height:46vh;overflow:auto"></div>`;
+  modal("Choisir un client",body,`<button class="btn" onclick="renderDraft()">Retour</button>`);
+  const q=document.getElementById("pcq");
+  const run=()=>{
+    const s=q.value.trim().toLowerCase();
+    let list=(CACHE.clients||[]);
+    if(s)list=list.filter(c=>clientNom(c).toLowerCase().includes(s)); else list=list.slice(0,0);
+    list=list.slice(0,60);
+    document.getElementById("pcList").innerHTML=list.length?`<table><tbody>${list.map(c=>
+      `<tr onclick="chooseClient(${c["RéfClient"]})"><td><b>${esc(clientNom(c))}</b><div class="muted" style="font-size:13px">${esc(c["AdresseFacturation"]||"")} ${esc(c["NuméroTél"]||"")}</div></td></tr>`).join("")}</tbody></table>`
+      :`<div class="muted" style="padding:14px">${s?"Aucun client. Créez-en un nouveau.":"Tapez un nom pour rechercher."}</div>`;
+  };
+  q.addEventListener("input",run); run();
+}
+function chooseClient(ref){draft.client=ref;renderDraft();}
+async function quickNewClient(){
+  const nom=prompt("Nom du nouveau client :"); if(!nom)return;
+  const ref=nextId("clients","RéfClient");
+  const c={"RéfClient":ref,"NomSociété":nom};
+  await putOne("clients",c); await loadCache();
+  draft.client=ref; toast("Client créé"); renderDraft();
+}
+
+/* sélecteur de produit */
+function pickProduct(){
+  syncDraftHeader();
+  const body=`<div class="search" style="margin-bottom:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+     <input id="ppq" type="search" placeholder="Nom du produit…" style="width:100%;padding-left:38px" autofocus></div>
+     <div id="ppList" style="max-height:50vh;overflow:auto"></div>`;
+  modal("Ajouter un produit",body,`<button class="btn" onclick="renderDraft()">Retour</button>`);
+  const q=document.getElementById("ppq");
+  const run=()=>{
+    const s=q.value.trim().toLowerCase();
+    let list=(CACHE.produits||[]);
+    if(s)list=list.filter(p=>(p["NomProduit"]||"").toLowerCase().includes(s));
+    list=list.slice(0,80);
+    document.getElementById("ppList").innerHTML=`<table><tbody>${list.map(p=>{
+      const cat=CACHE._catById[p["RéfCatégorie"]];
+      return `<tr onclick="addProduct(${p["RéfProduit"]})"><td><b>${esc(p["NomProduit"])}</b> <span class="chip">${esc(cat?cat["NomCatégorie"]:"")}</span></td><td class="right nowrap">${eur(p["PrixUnitaire"])}</td></tr>`;
+    }).join("")}</tbody></table>`;
+  };
+  q.addEventListener("input",run); run();
+}
+function addProduct(ref){
+  const p=CACHE._prodById[ref];
+  draft.lignes.push({prod:ref,qte:1,pu:Number(p["PrixUnitaire"])||0,com:"",ref:null});
+  renderDraft();
+}
+
+async function persistDraft(){
+  // écrit la commande (selon draft) et ses lignes ; renvoie la réf
+  let ref=draft.ref;
+  const existing= ref? Object.assign({},CACHE._cmdById[ref]) : {};
+  if(!ref){ ref=nextId("commandes","RéfCommande"); draft.ref=ref; }
+  const obj=Object.assign(existing,{
+    "RéfCommande":ref,"RéfClient":draft.client,"RéfEmployé":draft.emp?parseInt(draft.emp):0,
+    "DateCommande":existing["DateCommande"]||todayISO(),
+    "DateExpédition":draft.livraison?draft.livraison+"T00:00":null,
+    "Heure":draft.heure||null
+  });
+  if(draft.vente) obj["VenteDirecte"]=true;
+  await putOne("commandes",obj);
+  const old=(CACHE._lignesByCmd[ref]||[]).slice();
+  for(const l of old) await delOne("lignes",l["RéfDétailCommande"]);
+  let lid=nextId("lignes","RéfDétailCommande");
+  for(const l of draft.lignes){
+    const rec={"RéfDétailCommande":lid++,"RéfCommande":ref,"RéfProduit":l.prod||0,
+      "Quantité":Number(l.qte)||0,"PrixUnitaires":Number(l.pu)||0,"Remise":0,"Commentaire":l.com||null};
+    if(!l.prod) rec["Libelle"]=l.libelle||"Produit(s) supplémentaire(s)";
+    await putOne("lignes",rec);
+  }
+  await loadCache();
+  return ref;
+}
+async function saveCommande(){
+  syncDraftHeader();
+  if(!draft.client){toast("Choisissez un client",true);return;}
+  if(!draft.lignes.length){toast("Ajoutez au moins un produit",true);return;}
+  const isNew=!draft.ref;
+  const total=draft.lignes.reduce((s,l)=>s+(Number(l.qte)||0)*(Number(l.pu)||0),0);
+  const ref=await persistDraft();
+  // À la création : enregistrer le règlement éventuel (acompte / payée)
+  if(isNew && draft.statut && draft.statut!=="nonpaye"){
+    let montant = draft.statut==="paye" ? total : (Number(draft.acompte)||0);
+    montant=Math.round(montant*100)/100;
+    if(montant>0){
+      const k=draft.payMode||"cb";
+      await putOne("paiements",{"RéfPaiement":nextId("paiements","RéfPaiement"),"RéfCommande":ref,
+        "MontantPaiement":montant,"DatePaiement":todayISO(),"RéfModePaiement":modeRefFromKey(k),"Mode":modeLabelFromKey(k),"Banque":null});
+      await loadCache();
+    }
+  }
+  closeModal(); render(); toast("Commande enregistrée ✓");
+}
+async function saveVente(){
+  syncDraftHeader();
+  if(!draft.lignes.length){toast("Ajoutez au moins un article",true);return;}
+  if(!draft.client){ draft.client=await ensureComptoir(); }
+  const ref=await persistDraft();
+  closeModal(); encaisser(ref); // enchaîne directement sur l'encaissement
+}
+
+/* ---------- Impression du bon de commande ---------- */
+function printBon(ref){
+  const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===ref); const cl=CACHE._cliById[c["RéfClient"]];
+  const ls=(CACHE._lignesByCmd[ref]||[]);
+  const body=`<div class="bon">
+    <div class="bhead">
+      <div><h2 style="margin:0">${esc(SHOP.NomSociété)}</h2>
+        <div>${esc(SHOP.Activité||"")}</div>
+        <div>${esc(SHOP.Adresse||"")} — ${esc(SHOP.CodePostal||"")} ${esc(SHOP.Ville||"")}</div>
+        <div>Tél. ${esc(SHOP.NuméroTél||"")}</div></div>
+      <div class="right"><div style="font-size:20px"><b>Bon n°${ref}</b></div>
+        <div>Livraison : <b>${frDate(c["DateExpédition"])} ${esc(heure(c["Heure"]))}</b></div>
+        <div>Émis le ${frDate(todayISO())}</div></div>
+    </div>
+    <div style="margin-bottom:8px"><b>Client :</b> ${esc(clientNom(cl))}
+      ${cl&&cl["NuméroTél"]?" — Tél. "+esc(cl["NuméroTél"]):""}
+      ${cl&&cl["AdresseFacturation"]?"<br>"+esc(cl["AdresseFacturation"]):""}</div>
+    <table><thead><tr><th>Produit</th><th class="right">Qté</th><th class="right">P.U.</th><th class="right">Total</th></tr></thead><tbody>${
+      ls.map(l=>{const p=CACHE._prodById[l["RéfProduit"]];const t=(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0);
+        return `<tr><td>${esc(ligneNom(l))}${l["Commentaire"]?" — "+esc(l["Commentaire"]):""}</td><td class="right">${l["Quantité"]}</td><td class="right">${eur(l["PrixUnitaires"])}</td><td class="right">${eur(t)}</td></tr>`;}).join("")
+    }</tbody><tfoot><tr><td colspan="3" class="right"><b>TOTAL</b></td><td class="right"><b>${eur(cmdTotal(ref))}</b></td></tr></tfoot></table>
+    <div style="margin-top:18px;font-size:14px">Merci de votre confiance. Signature :</div>
+  </div>`;
+  modal("Bon de commande",body,`<button class="btn" onclick="closeModal()">Fermer</button><button class="btn primary" onclick="window.print()">Imprimer</button>`);
+}
+
+/* =================================================================
+   ENCAISSEMENTS (caisse)
+   ================================================================= */
+function modeLabelFromKey(k){ return {cheque:"Chèque",espece:"Espèce",cb:"CB"}[k]||k; }
+function modeRefFromKey(k){
+  const want={cheque:"ch",espece:"esp",cb:"car"}[k];
+  const m=(CACHE.modes||[]).find(x=>(x["ModePaiement"]||"").toLowerCase().startsWith(want));
+  return m?m["RéfModePaiement"]:0;
+}
+function payLabel(p){ if(p["Mode"])return p["Mode"]; const n=modeNom(p["RéfModePaiement"]); return n==="Carte"?"CB":(n||"—"); }
+function pickMode(slot,k){
+  window["_enMode"+slot]=k;
+  ["cheque","espece","cb"].forEach(x=>{const b=document.getElementById("mb"+slot+"_"+x); if(b)b.classList.toggle("on",x===k);});
+  const anyChq=(window._enMode1==="cheque")||(window._enMode2==="cheque"&&(parseFloat((document.getElementById("enMt2")||{}).value)||0)>0);
+  const w=document.getElementById("enBqWrap"); if(w)w.style.display=anyChq?"block":"none";
+}
+function enRemiseEur(){
+  const total=window._enTotal||0;
+  let r=parseFloat((document.getElementById("enRemise")||{}).value)||0;
+  if((document.getElementById("enRemiseType")||{}).value==="pct") r=total*r/100;
+  return Math.max(0,Math.min(total,Math.round(r*100)/100));
+}
+function enRecalc(driver){
+  const total=window._enTotal||0, deja=window._enDeja||0;
+  const restant=Math.round((total-enRemiseEur()-deja)*100)/100;
+  const lbl=document.getElementById("enNetLbl"); if(lbl)lbl.textContent=eur(Math.max(0,restant));
+  const i1=document.getElementById("enMt1"), i2=document.getElementById("enMt2");
+  if(!i1||!i2)return;
+  if(driver==="remise"){ i1.value=(restant>0?restant:0).toFixed(2); i2.value=""; }
+  else if(driver==="m1"){ const m1=parseFloat(i1.value)||0; const r=Math.round((restant-m1)*100)/100; i2.value=r>0.004?r.toFixed(2):""; }
+  else if(driver==="m2"){ const m2=parseFloat(i2.value)||0; const r=Math.round((restant-m2)*100)/100; i1.value=r>0.004?r.toFixed(2):""; }
+  pickMode(2,window._enMode2||"espece"); // rafraîchit l'affichage banque
+}
+function modeButtons(slot){
+  return `<div class="print-actions" style="margin-top:4px">
+    <button type="button" class="catchip" id="mb${slot}_cheque" onclick="pickMode(${slot},'cheque')">Chèque</button>
+    <button type="button" class="catchip" id="mb${slot}_espece" onclick="pickMode(${slot},'espece')">Espèce</button>
+    <button type="button" class="catchip" id="mb${slot}_cb" onclick="pickMode(${slot},'cb')">CB</button>
+  </div>`;
+}
+function encaisser(refCmd){
+  const total=cmdTotal(refCmd);
+  const deja=cmdPaye(refCmd);
+  const existRemise=Number((CACHE._cmdById[refCmd]||{})["Remise"])||0;
+  window._enRef=refCmd; window._enTotal=total; window._enDeja=deja;
+  const banques=(CACHE.banques||[]).filter(b=>b["Banque"]);
+  const body=`
+   <p class="muted" style="margin-top:0">Commande n°${refCmd} — total : <b>${eur(total)}</b>${deja>0.005?` · déjà réglé : <b>${eur(deja)}</b>`:""}</p>
+   <div class="grid2">
+     <label class="fld">Remise
+       <div class="row" style="gap:6px"><input id="enRemise" class="grow" type="number" min="0" step="0.01" value="${existRemise||0}" oninput="enRecalc('remise')">
+       <select id="enRemiseType" onchange="enRecalc('remise')" style="max-width:80px"><option value="eur">€</option><option value="pct">%</option></select></div></label>
+     <label class="fld">Date<input id="enDate" type="date" value="${todayISO()}"></label>
+   </div>
+   <div class="card pad" style="background:#fff;margin-top:10px;display:flex;align-items:center"><b class="grow">Reste à payer</b><span class="ttot" id="enNetLbl">${eur(Math.max(0,total-existRemise-deja))}</span></div>
+   <div style="margin-top:14px"><b>Paiement 1</b>${modeButtons(1)}
+     <input id="enMt1" type="number" step="0.01" min="0" style="margin-top:6px;width:160px" oninput="enRecalc('m1')"></div>
+   <div style="margin-top:12px"><b>Paiement 2 <span class="muted" style="font-weight:400">(si réglé en deux fois)</span></b>${modeButtons(2)}
+     <input id="enMt2" type="number" step="0.01" min="0" style="margin-top:6px;width:160px" oninput="enRecalc('m2')"></div>
+   <div id="enBqWrap" style="display:none;margin-top:12px"><label class="fld">Banque (chèque)
+     <select id="enBq"><option value="">—</option>${banques.map(b=>`<option>${esc(b["Banque"])}</option>`).join("")}</select></label></div>`;
+  modal("Encaisser un règlement",body,`<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="savePaiement()">Encaisser</button>`);
+  window._enMode1="cb"; window._enMode2="espece";
+  pickMode(1,"cb"); pickMode(2,"espece");
+  enRecalc("remise"); // pré-remplit paiement 1 = reste à payer
+}
+async function savePaiement(){
+  const refCmd=window._enRef;
+  const m1=parseFloat((document.getElementById("enMt1")||{}).value)||0;
+  const m2=parseFloat((document.getElementById("enMt2")||{}).value)||0;
+  if(m1+m2<=0){toast("Indiquez un montant",true);return;}
+  const remise=enRemiseEur();
+  const date=document.getElementById("enDate").value;
+  const bq=document.getElementById("enBq")?document.getElementById("enBq").value||null:null;
+  // remise enregistrée sur la commande
+  const c=Object.assign({},CACHE._cmdById[refCmd]); c["Remise"]=remise||0; await putOne("commandes",c);
+  let pid=nextId("paiements","RéfPaiement");
+  for(const [slot,amt] of [[1,m1],[2,m2]]){
+    if(amt<=0)continue;
+    const k=window["_enMode"+slot]||"cb";
+    await putOne("paiements",{"RéfPaiement":pid++,"RéfCommande":refCmd,"MontantPaiement":Math.round(amt*100)/100,
+      "DatePaiement":date,"RéfModePaiement":modeRefFromKey(k),"Mode":modeLabelFromKey(k),
+      "Banque":(k==="cheque")?bq:null});
+  }
+  await loadCache(); closeModal(); if(VIEW==="caisse")viewCaisse(); else render(); toast("Encaissement enregistré ✓");
+}
+async function deletePaiement(refP){
+  if(!confirm("Supprimer cet encaissement ? Le montant sera retiré de la caisse."))return;
+  await delOne("paiements",refP);
+  await loadCache();
+  if(VIEW==="caisse")viewCaisse(); else render();
+  if(window._openCmdRef && CACHE._cmdById[window._openCmdRef]) openCommande(window._openCmdRef); else closeModal();
+  toast("Encaissement supprimé");
+}
+
+let caisseQ="",caissePage=1;const CAISSE_PAGE_SIZE=50;
+function gotoCaissePage(p){caissePage=p;renderCaisseAttente();}
+function viewCaisse(){
+  const m=document.getElementById("main");
+  const d=(viewCaisse._date||todayISO());
+  // colonne droite : factures payées le jour choisi (groupées par commande)
+  const paysJour=(CACHE.paiements||[]).filter(p=>p["DatePaiement"]&&String(p["DatePaiement"]).slice(0,10)===d);
+  const parMode={}; let totalJour=0;
+  paysJour.forEach(p=>{const nm=payLabel(p);const v=Number(p["MontantPaiement"])||0;parMode[nm]=(parMode[nm]||0)+v;totalJour+=v;});
+  const payeByCmd={};
+  paysJour.forEach(p=>{const k=p["RéfCommande"];(payeByCmd[k]=payeByCmd[k]||{montant:0,modes:new Set()});payeByCmd[k].montant+=Number(p["MontantPaiement"])||0;payeByCmd[k].modes.add(payLabel(p));});
+  const payees=Object.keys(payeByCmd);
+  // colonne gauche : en attente (filtrable par nom)
+  const q=caisseQ.trim().toLowerCase();
+  let attente=(CACHE.commandes||[]).filter(c=>!c["Soldee"] && (CACHE._lignesByCmd[c["RéfCommande"]]||[]).length && cmdReste(c["RéfCommande"])>0.005);
+  if(q) attente=attente.filter(c=>clientNom(CACHE._cliById[c["RéfClient"]]).toLowerCase().includes(q));
+  attente.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
+  const nbAtt=attente.length; const totalDu=attente.reduce((s,c)=>s+cmdReste(c["RéfCommande"]),0);
+  const showAtt=attente.slice(0,300);
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:14px"><h1 style="margin:0" class="grow">Caisse</h1>
+     ${helpBtn('caisse')}
+     <button class="btn primary" onclick="venteDirecte()">+ Vente directe</button>
+     <label class="fld" style="flex-direction:row;align-items:center;gap:8px">Journée du <input id="caDate" type="date" value="${d}"></label></div>
+   <div class="stats" style="margin-bottom:16px">
+     <div class="card stat"><div class="n">${eur(totalJour)}</div><div class="l">Encaissé le ${frDate(d)}</div></div>
+     ${Object.entries(parMode).map(([k,v])=>`<div class="card stat"><div class="n">${eur(v)}</div><div class="l">${esc(k)}</div></div>`).join("")||'<div class="card stat"><div class="n">—</div><div class="l">Aucun encaissement</div></div>'}
+   </div>
+   <div class="grid2">
+     <div class="card">
+       <div class="pad" style="border-bottom:1px solid var(--line)">
+         <div class="row" style="align-items:center;margin-bottom:10px"><h2 style="margin:0" class="grow">En attente</h2><span class="chip" id="attCount">${nbAtt} · ${eur(totalDu)}</span></div>
+         <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+           <input id="caQ" type="search" placeholder="Filtrer par nom de client…" value="${esc(caisseQ)}"></div>
+       </div>
+       <div id="attBody"></div>
+     </div>
+     <div class="card">
+       <div class="pad" style="border-bottom:1px solid var(--line);display:flex;align-items:center">
+         <h2 style="margin:0" class="grow">Payées — ${frDate(d)}</h2><span class="chip soon">${payees.length}</span></div>
+       ${payees.length?`<table><thead><tr><th>Client</th><th>Mode</th><th class="right">Montant</th></tr></thead><tbody>${
+         payees.map(ref=>{const c=CACHE._cmdById[ref];const info=payeByCmd[ref];
+           return `<tr onclick="${c?`openCommande(${ref})`:''}"><td><b>${esc(c?clientNom(CACHE._cliById[c["RéfClient"]]):"—")}</b><div class="muted" style="font-size:12px">n°${ref}</div></td>
+           <td>${esc([...info.modes].join(" + "))}</td><td class="right nowrap"><b>${eur(info.montant)}</b></td></tr>`;}).join("")
+       }</tbody></table>`:`<div class="empty">Aucune facture payée ce jour-là.</div>`}
+     </div>
+   </div>`;
+  document.getElementById("caDate").addEventListener("change",e=>{viewCaisse._date=e.target.value;viewCaisse();});
+  const cq=document.getElementById("caQ"); if(cq)cq.addEventListener("input",e=>{caisseQ=e.target.value;caissePage=1;renderCaisseAttente();});
+  renderCaisseAttente();
+}
+function renderCaisseAttente(){
+  const q=caisseQ.trim().toLowerCase();
+  let attente=(CACHE.commandes||[]).filter(c=>!c["Soldee"] && (CACHE._lignesByCmd[c["RéfCommande"]]||[]).length && cmdReste(c["RéfCommande"])>0.005);
+  if(q) attente=attente.filter(c=>clientNom(CACHE._cliById[c["RéfClient"]]).toLowerCase().includes(q));
+  attente.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
+  const nbAtt=attente.length; const totalDu=attente.reduce((s,c)=>s+cmdReste(c["RéfCommande"]),0);
+  const pages=Math.max(1,Math.ceil(nbAtt/CAISSE_PAGE_SIZE));
+  if(caissePage>pages)caissePage=pages; if(caissePage<1)caissePage=1;
+  const startI=(caissePage-1)*CAISSE_PAGE_SIZE;
+  const pageItems=attente.slice(startI,startI+CAISSE_PAGE_SIZE);
+  const cnt=document.getElementById("attCount"); if(cnt)cnt.textContent=nbAtt+" · "+eur(totalDu);
+  const host=document.getElementById("attBody"); if(!host)return;
+  host.innerHTML= nbAtt
+    ? `<table><thead><tr><th>Client</th><th class="right">À régler</th><th></th></tr></thead><tbody>${
+        pageItems.map(c=>`<tr onclick="encaisser(${c["RéfCommande"]})"><td><b>${esc(clientNom(CACHE._cliById[c["RéfClient"]]))}</b><div class="muted" style="font-size:12px">n°${c["RéfCommande"]} · ${frDate(c["DateExpédition"])} ${esc(heure(c["Heure"]))}</div></td>
+          <td class="right nowrap"><b>${eur(cmdReste(c["RéfCommande"]))}</b></td>
+          <td class="right"><button class="btn sm primary" onclick="event.stopPropagation();encaisser(${c["RéfCommande"]})">Encaisser</button></td></tr>`).join("")
+      }</tbody></table>${pagerBar(caissePage,pages,"gotoCaissePage")}`
+    : `<div class="empty"><div class="big">${q?"Aucun résultat":"Rien en attente 🎉"}</div></div>`;
+}
+
+/* =================================================================
+   FACTURES & DEVIS
+   ================================================================= */
+async function makeDocument(refCmd,type){
+  const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===refCmd); if(!c)return;
+  // réutilise un document existant du même type s'il y en a déjà un pour cette commande
+  let doc=(CACHE.documents||[]).find(d=>d.refCommande===refCmd && d.type===type);
+  if(!doc){
+    doc={id:nextId("documents","id"),type,num:docNumero(type),date:todayISO(),
+      refCommande:refCmd,refClient:c["RéfClient"],total:cmdTotal(refCmd)};
+    await putOne("documents",doc); await loadCache();
+    toast((type==="facture"?"Facture":"Devis")+" "+doc.num+" créé ✓");
+  }
+  printDocument(doc.id);
+}
+function printDocument(id){
+  const doc=(CACHE.documents||[]).find(d=>d.id===id); if(!doc)return;
+  const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===doc.refCommande);
+  const cl=CACHE._cliById[doc.refClient];
+  const ls=(CACHE._lignesByCmd[doc.refCommande]||[]);
+  const tva=tvaBreakdown(doc.refCommande);
+  const totalTTC=cmdTotal(doc.refCommande);
+  const totalHT=Object.values(tva).reduce((s,g)=>s+g.ht,0);
+  const totalTVA=Object.values(tva).reduce((s,g)=>s+g.tva,0);
+  const estFacture=doc.type==="facture";
+  const reste=cmdReste(doc.refCommande);
+  const legal=[SHOP["CodeAPE"]?"APE "+SHOP["CodeAPE"]:"",SHOP["RC"]?"RCS "+SHOP["RC"]:"",cl&&cl["N intracommunautaire"]?"TVA "+cl["N intracommunautaire"]:""].filter(Boolean).join(" — ");
+  const body=`<div class="bon">
+    <div class="bhead">
+      <div><h2 style="margin:0">${esc(SHOP.NomSociété)}</h2>
+        <div>${esc(SHOP.Activité||"")}</div>
+        <div>${esc(SHOP.Adresse||"")} — ${esc(SHOP.CodePostal||"")} ${esc(SHOP.Ville||"")}</div>
+        <div>Tél. ${esc(SHOP.NuméroTél||"")}</div></div>
+      <div class="right"><div style="font-size:22px"><b>${estFacture?"FACTURE":"DEVIS"}</b></div>
+        <div><b>${esc(doc.num)}</b></div>
+        <div>Date : ${frDate(doc.date)}</div>
+        ${!estFacture?'<div>Validité : 30 jours</div>':''}</div>
+    </div>
+    <div style="margin-bottom:10px"><b>Client :</b> ${esc(clientNom(cl))}
+      ${cl&&cl["AdresseFacturation"]?"<br>"+esc(cl["AdresseFacturation"]):""}
+      ${cl&&cl["NuméroTél"]?"<br>Tél. "+esc(cl["NuméroTél"]):""}</div>
+    <table><thead><tr><th>Désignation</th><th class="right">Qté</th><th class="right">P.U. TTC</th><th class="right">Total TTC</th></tr></thead><tbody>${
+      ls.map(l=>{const p=CACHE._prodById[l["RéfProduit"]];const t=(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0);
+        return `<tr><td>${esc(ligneNom(l))}${l["Commentaire"]?" — "+esc(l["Commentaire"]):""}</td><td class="right">${l["Quantité"]}</td><td class="right">${eur(l["PrixUnitaires"])}</td><td class="right">${eur(t)}</td></tr>`;}).join("")
+    }</tbody></table>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><table style="max-width:340px">
+      <tr><td>Total HT</td><td class="right">${eur(totalHT)}</td></tr>
+      ${Object.entries(tva).map(([taux,g])=>`<tr><td>TVA ${taux} %</td><td class="right">${eur(g.tva)}</td></tr>`).join("")}
+      <tr><td><b>Total TTC</b></td><td class="right"><b>${eur(totalTTC)}</b></td></tr>
+      ${(function(){const rem=Number((CACHE._cmdById[doc.refCommande]||{})["Remise"])||0;return rem>0?`<tr><td>Remise</td><td class="right">− ${eur(rem)}</td></tr><tr><td><b>Net</b></td><td class="right"><b>${eur(totalTTC-rem)}</b></td></tr>`:"";})()}
+      ${estFacture?`<tr><td>Déjà réglé</td><td class="right">${eur(cmdPaye(doc.refCommande))}</td></tr>
+        <tr><td><b>Net à payer</b></td><td class="right"><b>${eur(Math.max(0,reste))}</b></td></tr>`:''}
+    </table></div>
+    ${estFacture?'':'<div style="margin-top:24px">Bon pour accord (date et signature) :</div>'}
+    <div style="margin-top:22px;font-size:12px;color:#6b563c;border-top:1px solid #d9c9a9;padding-top:8px">
+      ${esc(legal)}${legal?"<br>":""}${esc(SHOP.NomSociété)} — ${esc(SHOP.Adresse||"")}, ${esc(SHOP.CodePostal||"")} ${esc(SHOP.Ville||"")}
+    </div>
+  </div>`;
+  modal((estFacture?"Facture ":"Devis ")+doc.num,body,
+    `<button class="btn danger" onclick="deleteDocument(${doc.id})">Supprimer</button><button class="btn" onclick="closeModal()">Fermer</button><button class="btn primary" onclick="window.print()">Imprimer</button>`);
+}
+async function deleteDocument(id){
+  if(!confirm("Supprimer ce document ?"))return;
+  await delOne("documents",id); await loadCache(); closeModal();
+  if(VIEW==="facturation")viewFacturation(); toast("Document supprimé");
+}
+let factQ="",factType="",factPage=1;const FACT_PAGE_SIZE=50;
+function viewFacturation(){
+  const m=document.getElementById("main");
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:6px"><h1 style="margin:0" class="grow">Facturation</h1>${helpBtn('facturation')}</div>
+   <p class="muted" style="margin-top:0">Les factures et devis se créent depuis une commande (bouton « Facture » ou « Devis »). Retrouvez-les ici pour les rouvrir ou les réimprimer.</p>
+   <div class="card pad" style="margin-bottom:16px"><div class="row">
+     <div class="search grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+       <input id="fq" type="search" placeholder="N° de document ou nom de client…" value="${esc(factQ)}"></div>
+     <select id="ftype"><option value="">Tous</option><option value="facture">Factures</option><option value="devis">Devis</option></select>
+   </div></div>
+   <div class="card" id="factList"></div>`;
+  document.getElementById("fq").addEventListener("input",e=>{factQ=e.target.value;factPage=1;renderFactList();});
+  document.getElementById("ftype").addEventListener("change",e=>{factType=e.target.value;factPage=1;renderFactList();});
+  document.getElementById("ftype").value=factType;
+  renderFactList();
+}
+function gotoFactPage(p){factPage=p;renderFactList();}
+function renderFactList(){
+  const s=factQ.trim().toLowerCase();
+  let list=(CACHE.documents||[]).slice();
+  if(factType)list=list.filter(d=>d.type===factType);
+  if(s)list=list.filter(d=>(d.num||"").toLowerCase().includes(s)||clientNom(CACHE._cliById[d.refClient]).toLowerCase().includes(s));
+  list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")||b.id-a.id);
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/FACT_PAGE_SIZE));
+  if(factPage>pages)factPage=pages; if(factPage<1)factPage=1;
+  const startI=(factPage-1)*FACT_PAGE_SIZE;
+  const pageItems=list.slice(startI,startI+FACT_PAGE_SIZE);
+  const el=document.getElementById("factList");
+  el.innerHTML=total?`<table><thead><tr><th>N°</th><th>Type</th><th>Date</th><th>Client</th><th class="right">Total</th></tr></thead><tbody>${
+    pageItems.map(d=>`<tr onclick="printDocument(${d.id})"><td><b>${esc(d.num)}</b></td><td><span class="chip">${d.type==="facture"?"Facture":"Devis"}</span></td><td>${frDate(d.date)}</td><td>${esc(clientNom(CACHE._cliById[d.refClient]))}</td><td class="right"><b>${eur(cmdTotal(d.refCommande))}</b></td></tr>`).join("")
+  }</tbody></table>${pagerBar(factPage,pages,"gotoFactPage")}`:`<div class="empty"><div class="big">Aucun document</div>Créez une facture ou un devis depuis une commande.</div>`;
+}
+
+/* =================================================================
+   IMPRESSIONS (bon de fabrication labo, étiquettes 24/A4, liste du jour)
+   ================================================================= */
+function cmdsOfDate(date){
+  return (CACHE.commandes||[]).filter(c=>!c["VenteDirecte"] && c["DateExpédition"]&&String(c["DateExpédition"]).slice(0,10)===date
+     && (CACHE._lignesByCmd[c["RéfCommande"]]||[]).length)
+   .sort((a,b)=>String(a["Heure"]||"").localeCompare(String(b["Heure"]||"")));
+}
+let imprCats=null; // null = toutes ; sinon Set de RéfCatégorie sélectionnées (0 = sans catégorie)
+function catRefOf(refProduit){ const p=CACHE._prodById[refProduit]; return (p&&p["RéfCatégorie"]!=null)?p["RéfCatégorie"]:0; }
+function catOn(catRef){ return !imprCats || imprCats.has(catRef); }
+function catNomOf(catRef){ return catRef&&CACHE._catById[catRef]?CACHE._catById[catRef]["NomCatégorie"]:"Sans catégorie"; }
+function toggleImprCat(ref){
+  const all=(CACHE.categories||[]).map(c=>c["RéfCatégorie"]).concat([0]);
+  if(imprCats===null) imprCats=new Set(all);
+  if(imprCats.has(ref)) imprCats.delete(ref); else imprCats.add(ref);
+  if(all.every(r=>imprCats.has(r))) imprCats=null; // tout coché = "toutes"
+  viewImpressions();
+}
+function setImprCats(mode){ const all=(CACHE.categories||[]).map(c=>c["RéfCatégorie"]).concat([0]);
+  imprCats = mode==="all"? null : new Set(); viewImpressions(); }
+function viewImpressions(){
+  const m=document.getElementById("main");
+  const d=(viewImpressions._date||todayISO());
+  const cmds=cmdsOfDate(d);
+  const nbArt=cmds.reduce((s,c)=>s+(CACHE._lignesByCmd[c["RéfCommande"]]||[]).length,0);
+  const cats=(CACHE.categories||[]).slice().sort((a,b)=>(a["NomCatégorie"]||"").localeCompare(b["NomCatégorie"]||"","fr"));
+  const chip=(ref,label)=>{const on=catOn(ref);return `<button type="button" class="catchip${on?' on':''}" onclick="toggleImprCat(${ref})">${esc(label)}</button>`;};
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:6px"><h1 style="margin:0" class="grow">Impressions</h1>${helpBtn('impressions')}</div>
+   <p class="muted" style="margin-top:0">Choisissez une date et les catégories, puis lancez l'impression voulue.</p>
+   <div class="card pad" style="margin-bottom:16px">
+     <div class="row" style="align-items:center;margin-bottom:12px">
+       <label class="fld" style="flex-direction:row;align-items:center;gap:10px">Date de livraison / retrait
+         <input id="imDate" type="date" value="${d}"></label>
+       <span class="chip ${cmds.length?'soon':''}" style="margin-left:auto">${cmds.length} commande(s) · ${nbArt} article(s)</span>
+     </div>
+     <div style="border-top:1px solid var(--line);padding-top:12px">
+       <div class="row" style="align-items:center;margin-bottom:8px"><b class="grow">Catégories à imprimer</b>
+         <button class="btn sm" onclick="setImprCats('all')">Tout</button>
+         <button class="btn sm" onclick="setImprCats('none')">Aucune</button></div>
+       <div style="display:flex;flex-wrap:wrap;gap:8px">
+         ${cats.map(c=>chip(c["RéfCatégorie"],c["NomCatégorie"])).join("")}
+         ${chip(0,"Sans catégorie")}
+       </div>
+       <div class="muted" style="font-size:13px;margin-top:8px">${imprCats===null?"Toutes les catégories seront imprimées.":(imprCats.size+" catégorie(s) sélectionnée(s).")}</div>
+     </div>
+   </div>
+   <div class="stats">
+     <div class="card pad">
+       <h3 style="margin-top:0">Bon de fabrication (labo)</h3>
+       <p class="muted">Tout ce qu'il faut produire ce jour-là, quantités additionnées par produit (catégories choisies).</p>
+       <button class="btn primary big" ${cmds.length?'':'disabled'} onclick="printLabo('${d}')">Imprimer le bon labo</button>
+     </div>
+     <div class="card pad">
+       <h3 style="margin-top:0">Étiquettes de commande</h3>
+       <p class="muted">Une étiquette par catégorie et par commande (planche A4 de 24 · Agipa 70 × 37 mm).</p>
+       <div class="row" style="align-items:center;margin-bottom:10px">
+         <label class="fld" style="flex-direction:row;align-items:center;gap:8px">Commencer à la case
+           <input id="imStart" type="number" min="1" max="24" value="1" style="width:70px"></label>
+       </div>
+       <button class="btn primary big" ${cmds.length?'':'disabled'} onclick="printEtiquettes('${d}')">Imprimer les étiquettes</button>
+     </div>
+     <div class="card pad">
+       <h3 style="margin-top:0">Liste des commandes du jour</h3>
+       <p class="muted">Récapitulatif trié par client, avec détail et règlement.</p>
+       <button class="btn primary big" ${cmds.length?'':'disabled'} onclick="printListeJour('${d}')">Imprimer la liste</button>
+     </div>
+   </div>
+   ${cmds.length?'':'<div class="empty" style="margin-top:18px">Aucune commande à livrer ce jour-là. Changez la date ci-dessus.</div>'}`;
+  document.getElementById("imDate").addEventListener("change",e=>{viewImpressions._date=e.target.value;viewImpressions();});
+}
+
+function printModal(title,bodyHTML,labels){
+  modal(title,`<div id="printArea">${bodyHTML}</div>`,`<button class="btn no-print" onclick="closeModal()">Fermer</button><button class="btn primary no-print" onclick="window.print()">Imprimer</button>`);
+  document.body.classList.toggle("printing-labels",!!labels);
+}
+function printHeaderHTML(sub){
+  return `<div style="display:flex;justify-content:space-between;border-bottom:2px solid var(--praline);padding-bottom:8px;margin-bottom:12px;font-family:Georgia,serif">
+    <div><b style="font-size:18px">${esc(SHOP.NomSociété)}</b> <span class="muted">— ${esc(SHOP.Activité||"")}</span></div>
+    <div class="right">${esc(sub)}</div></div>`;
+}
+
+/* --- Bon de fabrication labo --- */
+function printLabo(date){
+  const cmds=cmdsOfDate(date);
+  const agg={}; // par produit : total + détail par commentaire
+  cmds.forEach(c=>(CACHE._lignesByCmd[c["RéfCommande"]]||[]).forEach(l=>{
+    const rp=l["RéfProduit"]; const catRef=catRefOf(rp); if(!catOn(catRef))return;
+    const com=(l["Commentaire"]||"").trim();
+    const key=rp?rp:("L:"+(l["Libelle"]||"supp"));
+    agg[key]=agg[key]||{nom:ligneNom(l),cat:catNomOf(catRef),qte:0,variants:{}};
+    const q=Number(l["Quantité"])||0;
+    agg[key].qte+=q;
+    if(com) agg[key].variants[com]=(agg[key].variants[com]||0)+q;
+  }));
+  const parCat={}; Object.values(agg).forEach(a=>{(parCat[a.cat]=parCat[a.cat]||[]).push(a);});
+  const cats=Object.keys(parCat).sort((a,b)=>a.localeCompare(b,"fr"));
+  const r2=x=>Math.round(x*100)/100;
+  let body=printHeaderHTML("Bon de fabrication — "+frDate(date));
+  body+=`<p style="margin:0 0 10px"><b>${cmds.length}</b> commande(s) pour le <b>${frDate(date)}</b></p>`;
+  body+= cats.length? cats.map(cat=>{
+    const items=parCat[cat].sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
+    const rows=items.map(it=>{
+      let r=`<tr><td>${esc(it.nom)}</td><td class="right" style="width:90px"><b>${r2(it.qte)}</b></td></tr>`;
+      const vars=Object.entries(it.variants).sort((a,b)=>b[1]-a[1]);
+      vars.forEach(([com,q])=>{ r+=`<tr><td style="padding-left:26px;font-style:italic;color:#555;border-bottom:0">${esc(com)}</td><td class="right" style="font-style:italic;color:#555;border-bottom:0">${r2(q)}</td></tr>`; });
+      return r;
+    }).join("");
+    return `<h3 style="margin:14px 0 4px;border-bottom:1px solid var(--line)">${esc(cat)}</h3>
+      <table><tbody>${rows}</tbody></table>`;
+  }).join("") : `<p class="muted">Aucun produit pour les catégories sélectionnées.</p>`;
+  printModal("Bon de fabrication — "+frDate(date),body,false);
+}
+
+/* --- Étiquettes : 1 par catégorie et par commande (24/A4) --- */
+function printEtiquettes(date){
+  const cmds=cmdsOfDate(date);
+  let start=parseInt(document.getElementById("imStart")?document.getElementById("imStart").value:"1")||1;
+  if(start<1)start=1; if(start>24)start=24;
+  const labels=[];
+  cmds.forEach(c=>{
+    const cl=CACHE._cliById[c["RéfClient"]];
+    const byCat={};
+    (CACHE._lignesByCmd[c["RéfCommande"]]||[]).forEach(l=>{
+      const catRef=catRefOf(l["RéfProduit"]); if(!catOn(catRef))return;
+      (byCat[catRef]=byCat[catRef]||[]).push(l);
+    });
+    Object.keys(byCat).sort((a,b)=>catNomOf(+a).localeCompare(catNomOf(+b),"fr")).forEach(catRef=>{
+      const items=byCat[catRef].map(l=>{const com=(l["Commentaire"]||"").trim();return (l["Quantité"]?l["Quantité"]+"× ":"")+ligneNom(l)+(com?" ("+com+")":"");}).join(" · ");
+      labels.push(`<div class="label">
+        <div class="lnom">${esc((clientNom(cl)||"").toUpperCase())}</div>
+        <div class="lcat">${esc(catNomOf(+catRef))}</div>
+        <div class="lmeta">${frDate(date)} ${esc(heure(c["Heure"]))} — n°${c["RéfCommande"]}</div>
+        <div class="litems">${esc(items)}</div></div>`);
+    });
+  });
+  const cells=[]; for(let i=1;i<start;i++)cells.push('<div class="label empty"></div>');
+  labels.forEach(l=>cells.push(l));
+  let sheets=""; for(let i=0;i<cells.length;i+=24){ sheets+=`<div class="sheet">${cells.slice(i,i+24).join("")}</div>`; }
+  if(!labels.length){ printModal("Étiquettes — "+frDate(date),`<p class="muted">Aucune étiquette pour les catégories sélectionnées.</p>`,false); return; }
+  printModal("Étiquettes — "+frDate(date)+" ("+labels.length+")",`<div class="labelsheet">${sheets}</div>`,true);
+}
+
+/* --- Liste des commandes du jour --- */
+function printListeJour(date){
+  let cmds=cmdsOfDate(date).slice().sort((a,b)=>clientNom(CACHE._cliById[a["RéfClient"]]).localeCompare(clientNom(CACHE._cliById[b["RéfClient"]]),"fr"));
+  let totJour=0, totReste=0; const rowsArr=[]; const parMode={}; let totEnc=0;
+  cmds.forEach(c=>{
+    const ref=c["RéfCommande"];
+    const lignes=(CACHE._lignesByCmd[ref]||[]).filter(l=>catOn(catRefOf(l["RéfProduit"])));
+    if(!lignes.length)return;
+    const cl=CACHE._cliById[c["RéfClient"]];
+    const tot=cmdTotal(ref); totJour+=tot;
+    const reste=cmdReste(ref); totReste+=Math.max(0,reste);
+    // cumul des règlements par moyen de paiement
+    paysOf(ref).forEach(p=>{const m=payLabel(p);const v=Number(p["MontantPaiement"])||0;parMode[m]=(parMode[m]||0)+v;totEnc+=v;});
+    const itemsHtml=lignes.map(l=>{const com=(l["Commentaire"]||"").trim();return `<div>${esc((l["Quantité"]||"")+"× "+ligneNom(l)+(com?" — "+com:""))}</div>`;}).join("");
+    const detail=payDetail(ref);
+    const regCell=`${statutChip(ref)}${detail?`<div class="muted" style="font-size:11.5px;margin-top:3px">${esc(detail)}</div>`:""}`;
+    rowsArr.push(`<tr><td class="nowrap" style="vertical-align:top">${esc(heure(c["Heure"]))}</td><td style="vertical-align:top"><b>${esc(clientNom(cl))}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${itemsHtml}</div></td>
+      <td class="right nowrap" style="vertical-align:top">${eur(tot)}</td><td style="vertical-align:top">${regCell}</td></tr>`);
+  });
+  let body=printHeaderHTML("Commandes du "+frDate(date));
+  body+=`<table><thead><tr><th>Heure</th><th>Client / détail</th><th class="right">Total</th><th>Règlement</th></tr></thead><tbody>${rowsArr.join("")||'<tr><td colspan="4" class="muted">Aucune commande pour les catégories choisies.</td></tr>'}</tbody>
+    <tfoot><tr><td colspan="2" class="right"><b>Total du jour</b></td><td class="right ttot">${eur(totJour)}</td><td></td></tr></tfoot></table>`;
+  // Récapitulatif des règlements
+  const modesOrder=["CB","Chèque","Espèce"];
+  const allModes=[...new Set([...modesOrder.filter(m=>parMode[m]),...Object.keys(parMode).filter(m=>!modesOrder.includes(m))])];
+  body+=`<div style="margin-top:18px;break-inside:avoid">
+    <h3 style="margin:0 0 6px;border-bottom:2px solid var(--praline);padding-bottom:4px">Récapitulatif des règlements</h3>
+    <table style="max-width:380px"><tbody>
+      ${allModes.length?allModes.map(m=>`<tr><td>${esc(m)}</td><td class="right">${eur(parMode[m])}</td></tr>`).join(""):'<tr><td class="muted">Aucun encaissement</td><td></td></tr>'}
+      <tr><td><b>Total encaissé</b></td><td class="right"><b>${eur(totEnc)}</b></td></tr>
+      <tr><td>Reste à encaisser</td><td class="right">${eur(totReste)}</td></tr>
+    </tbody></table></div>`;
+  printModal("Liste des commandes — "+frDate(date),body,false);
+}
+
+/* ---------- Clients ---------- */
+let cliQ="",cliPage=1;const CLI_PAGE_SIZE=50;
+function viewClients(){
+  const m=document.getElementById("main");
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:16px">
+     <h1 style="margin:0" class="grow">Clients</h1>
+     ${helpBtn('clients')}
+     <button class="btn primary big" onclick="editClient()">+ Nouveau client</button>
+   </div>
+   <div class="card pad" style="margin-bottom:16px">
+     <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+       <input id="clq" type="search" placeholder="Rechercher un client par nom…" value="${esc(cliQ)}"></div>
+   </div>
+   <div class="card" id="cliList"></div>`;
+  const q=document.getElementById("clq");
+  q.addEventListener("input",()=>{cliQ=q.value;cliPage=1;renderCliList();});
+  renderCliList();
+}
+function renderCliList(){
+  const s=cliQ.trim().toLowerCase();
+  let list=(CACHE.clients||[]);
+  if(s)list=list.filter(c=>clientNom(c).toLowerCase().includes(s));
+  list=list.slice().sort((a,b)=>clientNom(a).localeCompare(clientNom(b),"fr"));
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/CLI_PAGE_SIZE));
+  if(cliPage>pages)cliPage=pages; if(cliPage<1)cliPage=1;
+  const startI=(cliPage-1)*CLI_PAGE_SIZE;
+  const pageItems=list.slice(startI,startI+CLI_PAGE_SIZE);
+  const el=document.getElementById("cliList");
+  if(!total){el.innerHTML=`<div class="empty"><div class="big">Aucun client</div>Essayez un autre nom ou créez une fiche.</div>`;return;}
+  const pager=pages>1?`<div class="pad" style="display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)">
+      <button class="btn sm" ${cliPage<=1?'disabled':''} onclick="cliPage--;renderCliList()">‹ Précédent</button>
+      <span class="muted grow" style="text-align:center">Page ${cliPage} / ${pages}</span>
+      <button class="btn sm" ${cliPage>=pages?'disabled':''} onclick="cliPage++;renderCliList()">Suivant ›</button>
+    </div>`:"";
+  el.innerHTML=`<div class="pad muted" style="border-bottom:1px solid var(--line)">${total.toLocaleString("fr-FR")} client(s) — affichés ${startI+1}–${startI+pageItems.length}</div>
+    <table><thead><tr><th>Nom</th><th>Téléphone</th><th>Ville / adresse</th></tr></thead><tbody>${
+    pageItems.map(c=>`<tr onclick="openClient(${c["RéfClient"]})"><td><b>${esc(clientNom(c))}</b></td><td>${esc(c["NuméroTél"]||"")}</td><td class="muted">${esc(c["AdresseFacturation"]||"")}</td></tr>`).join("")
+    }</tbody></table>${pager}`;
+}
+function openClient(ref){
+  const c=CACHE._cliById[ref]; if(!c)return;
+  const allCmds=(CACHE.commandes||[]).filter(x=>x["RéfClient"]===ref);
+  const ca=allCmds.reduce((s,x)=>s+cmdTotal(x["RéfCommande"]),0);
+  const du=allCmds.reduce((s,x)=>s+Math.max(0,cmdReste(x["RéfCommande"])),0);
+  const cmds=allCmds.slice().sort((a,b)=>(b["DateExpédition"]||"").localeCompare(a["DateExpédition"]||"")).slice(0,30);
+  const body=`
+   <div class="stats" style="margin-bottom:16px">
+     <div class="card stat"><div class="n">${allCmds.length}</div><div class="l">Commandes</div></div>
+     <div class="card stat"><div class="n">${eur(ca)}</div><div class="l">Total cumulé</div></div>
+     <div class="card stat"><div class="n">${eur(du)}</div><div class="l">Reste dû</div></div>
+   </div>
+   <div style="margin-bottom:14px"><div class="muted" style="font-size:12px;text-transform:uppercase">Coordonnées</div>
+     <div>${esc(c["AdresseFacturation"]||"—")}</div><div class="muted">${esc(c["NuméroTél"]||"")}</div></div>
+   <h3 style="margin:6px 0">Dernières commandes</h3>
+   ${cmds.length?`<table><thead><tr><th>N°</th><th>Livraison</th><th class="right">Total</th><th class="right">Reste</th></tr></thead><tbody>${
+     cmds.map(c=>{const r=cmdReste(c["RéfCommande"]);return `<tr onclick="openCommande(${c["RéfCommande"]})"><td>${c["RéfCommande"]}</td><td>${frDate(c["DateExpédition"])} ${esc(heure(c["Heure"]))}</td><td class="right">${eur(cmdTotal(c["RéfCommande"]))}</td><td class="right">${r>0.005?'<span class="chip">'+eur(r)+'</span>':'<span class="chip soon">soldé</span>'}</td></tr>`;}).join("")
+   }</tbody></table>`:`<div class="muted">Aucune commande.</div>`}`;
+  modal(clientNom(c),body,`<button class="btn danger" onclick="deleteClient(${ref})">Supprimer</button><button class="btn primary" onclick="editClient(${ref})">Modifier la fiche</button>`);
+}
+function editClient(ref){
+  const c=ref?CACHE._cliById[ref]:{};
+  const body=`<div class="grid2">
+    <label class="fld">Nom / société<input id="eNom" type="text" value="${esc(c["NomSociété"]||"")}"></label>
+    <label class="fld">Contact (prénom)<input id="ePre" type="text" value="${esc(c["PrénomContact"]||"")}"></label>
+    <label class="fld">Téléphone<input id="eTel" type="text" value="${esc(c["NuméroTél"]||"")}"></label>
+    <label class="fld">Télécopie<input id="eFax" type="text" value="${esc(c["NumTélécopie"]||"")}"></label>
+    <label class="fld" style="grid-column:1/-1">Adresse<input id="eAdr" type="text" value="${esc(c["AdresseFacturation"]||"")}"></label>
+   </div>`;
+  modal(ref?"Modifier le client":"Nouveau client",body,
+    `<button class="btn" onclick="${ref?'openClient('+ref+')':'closeModal()'}">Annuler</button><button class="btn primary" onclick="saveClient(${ref||'null'})">Enregistrer</button>`);
+}
+async function saveClient(ref){
+  const g=id=>document.getElementById(id).value.trim();
+  const base= ref?Object.assign({},CACHE._cliById[ref]):{};
+  base["RéfClient"]= ref||nextId("clients","RéfClient");
+  base["NomSociété"]=g("eNom")||null; base["PrénomContact"]=g("ePre")||null;
+  base["NuméroTél"]=g("eTel")||null; base["NumTélécopie"]=g("eFax")||null; base["AdresseFacturation"]=g("eAdr")||null;
+  if(!base["NomSociété"]){toast("Indiquez au moins un nom",true);return;}
+  await putOne("clients",base); await loadCache(); closeModal(); render(); toast("Fiche client enregistrée ✓");
+}
+async function deleteClient(ref){
+  const nb=(CACHE.commandes||[]).filter(x=>x["RéfClient"]===ref).length;
+  if(nb){toast("Impossible : ce client a "+nb+" commande(s)",true);return;}
+  if(!confirm("Supprimer ce client ?"))return;
+  await delOne("clients",ref); await loadCache(); closeModal(); render(); toast("Client supprimé");
+}
+
+/* ---------- Produits ---------- */
+let prodQ="",prodCat="",prodPage=1;const PROD_PAGE_SIZE=50;
+function viewProduits(){
+  const m=document.getElementById("main");
+  const cats=(CACHE.categories||[]).slice().sort((a,b)=>(a["NomCatégorie"]||"").localeCompare(b["NomCatégorie"]||""));
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:16px">
+     <h1 style="margin:0" class="grow">Produits</h1>
+     ${helpBtn('produits')}
+     <button class="btn big" onclick="manageCategories()">Catégories</button>
+     <button class="btn big" onclick="manageComments()">Commentaires</button>
+     <button class="btn primary big" onclick="editProduit()">+ Nouveau produit</button>
+   </div>
+   <div class="card pad" style="margin-bottom:16px"><div class="row">
+     <div class="search grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+       <input id="pq" type="search" placeholder="Rechercher un produit…" value="${esc(prodQ)}"></div>
+     <select id="pcat"><option value="">Toutes les catégories</option>${cats.map(c=>`<option value="${c["RéfCatégorie"]}" ${prodCat==c["RéfCatégorie"]?"selected":""}>${esc(c["NomCatégorie"])}</option>`).join("")}</select>
+   </div></div>
+   <div class="card" id="prodList"></div>`;
+  document.getElementById("pq").addEventListener("input",e=>{prodQ=e.target.value;prodPage=1;renderProdList();});
+  document.getElementById("pcat").addEventListener("change",e=>{prodCat=e.target.value;prodPage=1;renderProdList();});
+  renderProdList();
+}
+function renderProdList(){
+  const s=prodQ.trim().toLowerCase();
+  let list=(CACHE.produits||[]);
+  if(s)list=list.filter(p=>(p["NomProduit"]||"").toLowerCase().includes(s));
+  if(prodCat)list=list.filter(p=>String(p["RéfCatégorie"])===String(prodCat));
+  list=list.slice().sort((a,b)=>(a["NomProduit"]||"").localeCompare(b["NomProduit"]||"","fr"));
+  const total=list.length;
+  const pages=Math.max(1,Math.ceil(total/PROD_PAGE_SIZE));
+  if(prodPage>pages)prodPage=pages; if(prodPage<1)prodPage=1;
+  const startI=(prodPage-1)*PROD_PAGE_SIZE;
+  const pageItems=list.slice(startI,startI+PROD_PAGE_SIZE);
+  const el=document.getElementById("prodList");
+  if(!total){el.innerHTML=`<div class="empty"><div class="big">Aucun produit</div></div>`;return;}
+  const pager=pages>1?`<div class="pad" style="display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)">
+      <button class="btn sm" ${prodPage<=1?'disabled':''} onclick="prodPage--;renderProdList()">‹ Précédent</button>
+      <span class="muted grow" style="text-align:center">Page ${prodPage} / ${pages}</span>
+      <button class="btn sm" ${prodPage>=pages?'disabled':''} onclick="prodPage++;renderProdList()">Suivant ›</button>
+    </div>`:"";
+  el.innerHTML=`<div class="pad muted" style="border-bottom:1px solid var(--line)">${total.toLocaleString("fr-FR")} produit(s) — affichés ${startI+1}–${startI+pageItems.length}</div>
+    <table><thead><tr><th>Produit</th><th>Catégorie</th><th class="right">TVA</th><th class="right">Prix</th></tr></thead><tbody>${
+    pageItems.map(p=>{const cat=CACHE._catById[p["RéfCatégorie"]];
+      return `<tr onclick="editProduit(${p["RéfProduit"]})"><td><b>${esc(p["NomProduit"])}</b>${p["Descriptif"]?'<div class="muted" style="font-size:13px">'+esc(p["Descriptif"])+'</div>':''}</td><td><span class="chip">${esc(cat?cat["NomCatégorie"]:"—")}</span></td><td class="right">${p["TVA"]!=null?p["TVA"]+" %":""}</td><td class="right nowrap"><b>${eur(p["PrixUnitaire"])}</b></td></tr>`;
+    }).join("")}</tbody></table>${pager}`;
+}
+/* ---------- Gestion des catégories ---------- */
+function manageCategories(){
+  const cats=(CACHE.categories||[]).slice().sort((a,b)=>(a["NomCatégorie"]||"").localeCompare(b["NomCatégorie"]||"","fr"));
+  const body=`
+   <div class="row" style="gap:8px;margin-bottom:14px">
+     <input id="newCat" type="text" class="grow" placeholder="Nom de la nouvelle catégorie…">
+     <button class="btn primary" onclick="addCategory()">Ajouter</button>
+   </div>
+   ${cats.length?`<table><tbody>${cats.map(c=>{
+     const nb=(CACHE.produits||[]).filter(p=>p["RéfCatégorie"]===c["RéfCatégorie"]).length;
+     return `<tr style="cursor:default"><td><input type="text" value="${esc(c["NomCatégorie"]||"")}" id="cat_${c["RéfCatégorie"]}" style="width:100%"></td>
+       <td class="muted nowrap" style="width:90px">${nb} produit${nb>1?'s':''}</td>
+       <td class="nowrap" style="width:140px"><button class="btn sm" onclick="saveCategory(${c["RéfCatégorie"]})">Renommer</button>
+       <button class="btn sm danger" onclick="deleteCategory(${c["RéfCatégorie"]})">Suppr.</button></td></tr>`;
+   }).join("")}</tbody></table>`:`<div class="muted">Aucune catégorie.</div>`}
+   <p class="muted" style="font-size:13px;margin-bottom:0">Une catégorie utilisée par des produits ne peut pas être supprimée tant que des produits y sont rattachés.</p>`;
+  modal("Catégories de produits",body,`<button class="btn primary" onclick="closeModal()">Terminé</button>`);
+}
+async function addCategory(){
+  const nom=(document.getElementById("newCat").value||"").trim();
+  if(!nom){toast("Indiquez un nom",true);return;}
+  const ref=nextId("categories","RéfCatégorie");
+  await putOne("categories",{"RéfCatégorie":ref,"NomCatégorie":nom,"Coef":0});
+  await loadCache(); manageCategories(); render(); toast("Catégorie ajoutée ✓");
+}
+async function saveCategory(ref){
+  const nom=(document.getElementById("cat_"+ref).value||"").trim();
+  if(!nom){toast("Le nom ne peut pas être vide",true);return;}
+  const c=Object.assign({},CACHE._catById[ref]); c["NomCatégorie"]=nom;
+  await putOne("categories",c); await loadCache(); manageCategories(); render(); toast("Catégorie renommée ✓");
+}
+async function deleteCategory(ref){
+  const nb=(CACHE.produits||[]).filter(p=>p["RéfCatégorie"]===ref).length;
+  if(nb){toast("Impossible : "+nb+" produit(s) utilisent cette catégorie",true);return;}
+  if(!confirm("Supprimer cette catégorie ?"))return;
+  await delOne("categories",ref); await loadCache(); manageCategories(); render(); toast("Catégorie supprimée");
+}
+
+/* ---------- Bibliothèque de commentaires (par catégorie) ---------- */
+let comCat=null;
+function manageComments(){
+  const cats=(CACHE.categories||[]).slice().sort((a,b)=>(a["NomCatégorie"]||"").localeCompare(b["NomCatégorie"]||"","fr"));
+  if(comCat==null && cats.length) comCat=cats[0]["RéfCatégorie"];
+  const opts=cats.map(c=>`<option value="${c["RéfCatégorie"]}" ${comCat==c["RéfCatégorie"]?"selected":""}>${esc(c["NomCatégorie"])}</option>`).join("")+`<option value="0" ${comCat==0?"selected":""}>Sans catégorie</option>`;
+  const items=comList(comCat==null?0:comCat);
+  const body=`
+   <p class="muted" style="margin-top:0">Préparez des commentaires types par catégorie (ex. « sans fromage », « bien cuit »). Ils seront proposés automatiquement lors de la saisie des produits de cette catégorie en commande.</p>
+   <label class="fld" style="margin-bottom:14px">Catégorie
+     <select id="comCatSel" onchange="comCat=this.value==='0'?0:parseInt(this.value);manageComments()" style="max-width:320px">${opts}</select></label>
+   <div class="row" style="gap:8px;margin-bottom:14px">
+     <input id="newCom" type="text" class="grow" placeholder="Nouveau commentaire…" onkeydown="if(event.key==='Enter')addCommentLib()">
+     <button class="btn primary" onclick="addCommentLib()">Ajouter</button>
+   </div>
+   ${items.length?`<div style="display:flex;flex-wrap:wrap;gap:8px">${items.map((c,idx)=>`<span class="chip" style="display:inline-flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;font-size:14px">${esc(c)} <button class="btn ghost sm" style="padding:0 6px" title="Retirer" onclick="removeCommentLib(${idx})">✕</button></span>`).join("")}</div>`
+     :`<div class="muted">Aucun commentaire pour cette catégorie.</div>`}`;
+  modal("Bibliothèque de commentaires",body,`<button class="btn primary" onclick="closeModal()">Terminé</button>`);
+}
+async function addCommentLib(){
+  const v=(document.getElementById("newCom").value||"").trim(); if(!v){toast("Saisissez un commentaire",true);return;}
+  await addComToLib(comCat==null?0:comCat, v); manageComments(); toast("Commentaire ajouté ✓");
+}
+async function removeCommentLib(idx){
+  const cr=comCat==null?0:comCat; const items=comList(cr); const text=items[idx];
+  if(text==null)return; await removeComFromLib(cr, text); manageComments();
+}
+
+function editProduit(ref){
+  const p=ref?CACHE._prodById[ref]:{};
+  const cats=(CACHE.categories||[]).slice().sort((a,b)=>(a["NomCatégorie"]||"").localeCompare(b["NomCatégorie"]||""));
+  const body=`<div class="grid2">
+    <label class="fld" style="grid-column:1/-1">Nom du produit<input id="pNom" type="text" value="${esc(p["NomProduit"]||"")}"></label>
+    <label class="fld">Catégorie<select id="pCat">${cats.map(c=>`<option value="${c["RéfCatégorie"]}" ${p["RéfCatégorie"]==c["RéfCatégorie"]?"selected":""}>${esc(c["NomCatégorie"])}</option>`).join("")}</select></label>
+    <label class="fld">Prix de vente (€)<input id="pPrix" type="number" step="0.01" min="0" value="${p["PrixUnitaire"]!=null?p["PrixUnitaire"]:""}"></label>
+    <label class="fld">TVA (%)<input id="pTva" type="number" step="0.1" value="${p["TVA"]!=null?p["TVA"]:5.5}"></label>
+    <label class="fld" style="grid-column:1/-1">Descriptif<input id="pDesc" type="text" value="${esc(p["Descriptif"]||"")}"></label>
+   </div>`;
+  modal(ref?"Modifier le produit":"Nouveau produit",body,
+    `<button class="btn" onclick="closeModal()">Annuler</button>${ref?`<button class="btn danger" onclick="deleteProduit(${ref})">Supprimer</button>`:""}<button class="btn primary" onclick="saveProduit(${ref||'null'})">Enregistrer</button>`);
+}
+async function saveProduit(ref){
+  const base=ref?Object.assign({},CACHE._prodById[ref]):{};
+  base["RéfProduit"]=ref||nextId("produits","RéfProduit");
+  base["NomProduit"]=document.getElementById("pNom").value.trim();
+  base["RéfCatégorie"]=parseInt(document.getElementById("pCat").value)||null;
+  base["PrixUnitaire"]=parseFloat(document.getElementById("pPrix").value)||0;
+  base["TVA"]=parseFloat(document.getElementById("pTva").value)||0;
+  base["Descriptif"]=document.getElementById("pDesc").value.trim()||null;
+  if(!base["NomProduit"]){toast("Indiquez un nom de produit",true);return;}
+  await putOne("produits",base); await loadCache(); closeModal(); render(); toast("Produit enregistré ✓");
+}
+async function deleteProduit(ref){
+  if(!confirm("Supprimer ce produit ? (les commandes passées ne sont pas modifiées)"))return;
+  await delOne("produits",ref); await loadCache(); closeModal(); render(); toast("Produit supprimé");
+}
+
+/* ---------- Sauvegarde / restauration ---------- */
+function viewSauvegarde(){
+  const m=document.getElementById("main");
+  getMeta("lastBackup").then(lb=>{
+    m.innerHTML=`
+    <div class="row" style="align-items:center;margin-bottom:6px"><h1 style="margin:0" class="grow">Sauvegarde</h1>${helpBtn('sauvegarde')}</div>
+    <p class="muted" style="margin-top:0">Vos données vivent sur cet ordinateur. Faites régulièrement une sauvegarde de secours
+    (sur une clé USB ou un autre dossier) pour ne jamais rien perdre.</p>
+    <div class="grid2">
+      <div class="card pad">
+        <h3 style="margin-top:0">Enregistrer une sauvegarde</h3>
+        <p class="muted">Crée un fichier <b>.json</b> contenant toutes vos données actuelles (clients, produits, commandes, historique).</p>
+        <button class="btn primary big" onclick="doBackup()">Télécharger la sauvegarde</button>
+        <p class="muted" style="margin-bottom:0">Dernière sauvegarde : <b>${lb?esc(lb):"jamais"}</b></p>
+      </div>
+      <div class="card pad">
+        <h3 style="margin-top:0">Restaurer / réimporter</h3>
+        <p class="muted">Recharge les données depuis un fichier de sauvegarde ou le fichier d'historique d'origine. Les enregistrements de même numéro sont remplacés.</p>
+        <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+        <button class="btn big" onclick="document.getElementById('restoreFile').click()">Choisir un fichier…</button>
+        <p id="restoreStatus" class="muted" style="margin-bottom:0"></p>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:16px">
+      <h3 style="margin-top:0">À propos</h3>
+      <p class="muted" style="margin-bottom:0">Application locale « BestellBack ». Fonctionne sans connexion internet, sur n'importe quel ordinateur récent.
+      Pour l'utiliser sur un autre poste : copiez ce fichier <b>.html</b>, ouvrez-le, puis importez votre dernière sauvegarde.</p>
+    </div>`;
+    document.getElementById("restoreFile").addEventListener("change",doRestore);
+  });
+}
+async function doBackup(){
+  const out={};
+  for(const s of ALL_STORES) out[s]=await getAll(s);
+  out.documents=await getAll("documents");
+  out.commentaires=await getAll("commentaires");
+  const aut=await getAll("_autres"); if(aut.length)out._autres=aut;
+  const blob=new Blob([JSON.stringify(out)],{type:"application/json"});
+  const a=document.createElement("a");
+  const stamp=new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");
+  a.href=URL.createObjectURL(blob); a.download="Sauvegarde-ALaTentation-"+stamp+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  await setMeta("lastBackup",new Date().toLocaleString("fr-FR"));
+  toast("Sauvegarde téléchargée ✓"); viewSauvegarde();
+}
+async function doRestore(e){
+  const f=e.target.files[0]; if(!f)return;
+  const st=document.getElementById("restoreStatus"); st.textContent="Lecture…"; st.className="muted pulse";
+  try{
+    const data=JSON.parse(await f.text());
+    if(data._autres){ for(const r of data._autres) await putOne("_autres",r); delete data._autres; }
+    await importData(data,st);
+    await loadCache(); st.className="muted"; st.textContent="Restauration terminée ✓"; toast("Données restaurées ✓"); render();
+  }catch(err){ st.className="muted"; st.textContent="Erreur : "+err.message; }
+}
+
+/* =================================================================
+   DÉMARRAGE
+   ================================================================= */
+async function start(){
+  await loadCache();
+  document.getElementById("gate").style.display="none";
+  document.getElementById("app").style.display="block";
+  VIEW="dash"; render();
+}
+(async function init(){
+  try{ DB=await openDB(); }
+  catch(e){ document.getElementById("gate").style.display="block";
+    document.getElementById("importStatus").textContent="Ce navigateur ne permet pas le stockage local. Utilisez Chrome, Edge ou Firefox récents.";
+    return; }
+  const imported=await getMeta("imported");
+  if(imported){ start(); }
+  else{ document.getElementById("gate").style.display="block"; }
+})();
+</script>
+<script>
+/* --- Installation en application (PWA) : fonctionne hors ligne une fois ouverte --- */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(e=>console.log("SW non enregistré:",e));
+  });
+}
+</script>
+</body>
+</html>
