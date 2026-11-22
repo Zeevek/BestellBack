@@ -589,6 +589,8 @@ const HELP={
    <li>Le formulaire de commande montre <b>à l'avance</b> ce qui va se passer (✓ prise directe, ✂ découpe, ⚠ stock insuffisant). Une commande hors stock est quand même enregistrée, et signalée ici en haut de l'écran.</li>
    <li><b>Modifier ou supprimer une commande</b> rend les pièces au stock. Si la découpe n'a plus lieu d'être (la 8 est toujours là), la bûche de 12 est reformée.</li>
    <li><b>Entrées</b> : « Ajouter » après une fournée ; boutons − et + sur chaque taille pour corriger. Tous les mouvements sont listés dans « Derniers mouvements ».</li>
+   <li><b>Choisir la bûche à entamer</b> : dans la commande, quand plusieurs bûches conviennent, un menu « Bûche à utiliser » permet par exemple d'<b>entamer une nouvelle 12</b> plutôt que de finir une 6 et laisser une chute de 2. Par défaut, c'est le choix automatique. Sur une commande déjà enregistrée, « changer la découpe » rouvre ce choix.</li>
+   <li><b>Fiche de stock</b> : bouton « Imprimer la fiche » (ici ou dans Impressions) — le solde restant par taille, ce qui est réservé pour les commandes à venir et ce qui reste à produire.</li>
    <li>Le <b>bon de fabrication</b> indique les découpes à faire (✂ couper 12 → 4).</li></ul>`},
  sauvegarde:{t:"Aide — Sauvegarde",h:`<p>Le plus important pour ne jamais rien perdre.</p>
    <ul><li><b>Télécharger la sauvegarde</b> : crée un fichier de secours avec toutes vos données. À faire régulièrement, et à copier sur une clé USB.</li>
@@ -871,14 +873,14 @@ async function deleteCommande(ref){
 
 /* ---------- Saisie / édition d'une commande ---------- */
 let draft=null;
-function draftSig(){ return JSON.stringify([draft.client,draft.livraison,draft.heure,String(draft.emp||""),draft.lignes.map(l=>[l.prod,l.libelle||"",+l.qte,+l.pu,l.com||""]),draft.statut||"",+draft.acompte||0]); }
+function draftSig(){ return JSON.stringify([draft.client,draft.livraison,draft.heure,String(draft.emp||""),draft.lignes.map(l=>[l.prod,l.libelle||"",+l.qte,+l.pu,l.com||"",l.src||null]),draft.statut||"",+draft.acompte||0]); }
 function draftDirty(){ if(!draft)return false; syncDraftHeader(); return draftSig()!==draft._snap; }
 function newCommande(editRef){
   if(editRef){
     const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===editRef);
     draft={ref:editRef, vente:!!c["VenteDirecte"], client:c["RéfClient"], livraison:(c["DateExpédition"]||"").slice(0,10),
       heure:(c["Heure"]||""), emp:c["RéfEmployé"]||"",
-      lignes:(CACHE._lignesByCmd[editRef]||[]).map(l=>({prod:l["RéfProduit"]||0,libelle:l["Libelle"]||"",qte:l["Quantité"]||1,pu:l["PrixUnitaires"]||0,com:l["Commentaire"]||"",ref:l["RéfDétailCommande"],alloc:l["StockAlloc"]||null}))};
+      lignes:(CACHE._lignesByCmd[editRef]||[]).map(l=>({prod:l["RéfProduit"]||0,libelle:l["Libelle"]||"",qte:l["Quantité"]||1,pu:l["PrixUnitaires"]||0,com:l["Commentaire"]||"",ref:l["RéfDétailCommande"],alloc:l["StockAlloc"]||null,src:(l["StockAlloc"]||{}).src||null}))};
   }else{
     draft={ref:null,vente:false,client:null,livraison:todayISO(),heure:"",emp:"",lignes:[],statut:"nonpaye",acompte:0,payMode:"cb"};
   }
@@ -1532,6 +1534,11 @@ function viewImpressions(){
        </div>
        <button class="btn primary big" ${cmds.length?'':'disabled'} onclick="printEtiquettes('${d}')">Imprimer les étiquettes</button>
      </div>
+     ${(CACHE.stock||[]).length?`<div class="card pad">
+       <h3 style="margin-top:0">Fiche de stock</h3>
+       <p class="muted">Le solde des bûches restantes par taille, ce qui est réservé et ce qui reste à produire.</p>
+       <button class="btn primary big" onclick="printStockFiche()">Imprimer la fiche</button>
+     </div>`:""}
      <div class="card pad">
        <h3 style="margin-top:0">Liste des commandes du jour</h3>
        <p class="muted">Récapitulatif trié par client, avec détail et règlement.</p>
@@ -1912,8 +1919,10 @@ function piecesTotal(art){ const P=art.pieces||{}; return Object.keys(P).reduce(
 function piecesNb(art){ const P=art.pieces||{}; return Object.values(P).reduce((s,v)=>s+v,0); }
 function decPiece(art,n){ const P=art.pieces; P[n]--; if(P[n]<=0)delete P[n]; }
 function putPiece(art,n){ const P=art.pieces=art.pieces||{}; n=Math.round(n*100)/100; P[n]=(P[n]||0)+1; }
-function takePiece(art,n){
+function takePiece(art,n,pref){
   art.pieces=art.pieces||{};
+  // bûche choisie à la commande (ex. « entamer une 12 » plutôt que finir la 6)
+  if(pref&&pref>=n&&art.pieces[pref]>0&&(pref===n||art.decoupable!==false)){ decPiece(art,pref); if(pref>n)putPiece(art,pref-n); return {n,de:pref}; }
   if(art.pieces[n]>0){ decPiece(art,n); return {n,de:n}; }
   if(art.decoupable===false) return null;
   // on coupe la plus petite pièce plus grande, sans laisser de reste trop petit pour être vendu
@@ -1935,10 +1944,10 @@ function allocDesc(a){
   if(a.manque&&a.manque.length) parts.push("manque "+persList(a.manque));
   return parts.join(" · ");
 }
-function allocate(art,sizes,label){
+function allocate(art,sizes,label,pref){
   const pris=[],manque=[];
-  sizes.slice().sort((a,b)=>b-a).forEach(n=>{ const r=takePiece(art,n); if(r)pris.push(r); else manque.push(n); });
-  const a={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,7),art:art.id,pris,manque};
+  sizes.slice().sort((a,b)=>b-a).forEach(n=>{ const r=takePiece(art,n,pref); if(r)pris.push(r); else manque.push(n); });
+  const a={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,7),art:art.id,pris,manque,src:pref||null};
   stockLog(art,`${label} : sortie ${allocDesc(a)}`);
   return a;
 }
@@ -1952,8 +1961,9 @@ function releaseInto(art,a,label){
   });
   if((a.pris||[]).length) stockLog(art,`${label} : retour ${(a.pris||[]).map(p=>PERS(p.n)).join(", ")}`);
 }
-function allocReusable(alloc,nd){
+function allocReusable(alloc,nd,l){
   if(!alloc||!nd||alloc.art!==nd.art||(alloc.manque||[]).length)return false;
+  if(l&&(l._free||(l.src||null)!==(alloc.src||null)))return false; // découpe changée : on refait la prise
   const a=(alloc.pris||[]).map(p=>p.n).sort((x,y)=>x-y), b=nd.sizes.slice().sort((x,y)=>x-y);
   return a.length===b.length&&a.every((v,i)=>v===b[i]);
 }
@@ -1963,9 +1973,9 @@ async function stockApply(oldLines,newLines,label){
   const work={}; const art=id=>{ if(!(id in work)){ const a=CACHE._stockById[id]; work[id]=a?JSON.parse(JSON.stringify(a)):null; } return work[id]; };
   const keep=new Set();
   const plan=newLines.map(l=>{ const nd=stockNeeds(l.prod,l.qte); if(!nd)return null;
-    if(allocReusable(l.alloc,nd)){ keep.add(l.alloc.uid); return l.alloc; } return {nd}; });
+    if(allocReusable(l.alloc,nd,l)){ keep.add(l.alloc.uid); return l.alloc; } return {nd,src:l.src||null}; });
   oldLines.forEach(a=>{ if(a&&!keep.has(a.uid)){ const ar=art(a.art); if(ar)releaseInto(ar,a,label); } });
-  const res=plan.map(x=>x&&x.nd?allocate(art(x.nd.art),x.nd.sizes,label):x);
+  const res=plan.map(x=>x&&x.nd?allocate(art(x.nd.art),x.nd.sizes,label,x.src):x);
   for(const a of Object.values(work)) if(a) await putOne("stock",a);
   return res;
 }
@@ -1981,20 +1991,67 @@ function stockNote(l){
 function draftStockNotes(){
   const work={}; const art=id=>{ if(!(id in work)){ const a=CACHE._stockById[id]; work[id]=a?JSON.parse(JSON.stringify(a)):null; } return work[id]; };
   const nds=draft.lignes.map(l=>stockNeeds(l.prod,l.qte));
-  const keep=new Set(draft.lignes.map((l,i)=>allocReusable(l.alloc,nds[i])?l.alloc.uid:null).filter(Boolean));
+  const keep=new Set(draft.lignes.map((l,i)=>allocReusable(l.alloc,nds[i],l)?l.alloc.uid:null).filter(Boolean));
   draft.lignes.forEach(l=>{ if(l.alloc&&!keep.has(l.alloc.uid)){ const ar=art(l.alloc.art); if(ar)releaseInto(ar,l.alloc,""); } });
   return draft.lignes.map((l,i)=>{
     const nd=nds[i]; if(!nd)return "";
     const ar=art(nd.art);
-    if(keep.has(l.alloc&&l.alloc.uid)) return `<div class="stocknote ok">✓ Réservé en stock : ${esc(allocDesc(l.alloc))}</div>`;
-    const a=allocate(ar,nd.sizes,"");
+    if(keep.has(l.alloc&&l.alloc.uid)) return `<div class="stocknote ok">✓ Réservé en stock : ${esc(allocDesc(l.alloc))}
+      ${ar&&ar.decoupable!==false?`<button type="button" class="btn ghost sm" style="padding:0 6px;font-size:12.5px;text-decoration:underline" onclick="freeCut(${i})">changer la découpe</button>`:""}</div>`;
+    const choix=cutChoiceHTML(ar,nd,l,i);
+    const a=allocate(ar,nd.sizes,"",l.src);
     const reste=` — il restera ${piecesNb(ar)} pièce(s), ${PERS(piecesTotal(ar))}`;
-    if(a.manque.length) return `<div class="stocknote warn">⚠ ${esc(ar.nom)} : stock insuffisant (manque ${esc(persList(a.manque))})</div>`;
+    if(a.manque.length) return `<div class="stocknote warn">⚠ ${esc(ar.nom)} : stock insuffisant (manque ${esc(persList(a.manque))})</div>${choix}`;
     const cut=a.pris.some(p=>p.de>p.n);
-    return `<div class="stocknote ${cut?'info':'ok'}">${cut?"✂":"✓"} ${esc(ar.nom)} : ${esc(allocDesc(a))}${esc(reste)}</div>`;
+    return `<div class="stocknote ${cut?'info':'ok'}">${cut?"✂":"✓"} ${esc(ar.nom)} : ${esc(allocDesc(a))}${esc(reste)}</div>${choix}`;
   });
 }
+// Menu « quelle bûche entamer ? » : proposé dès qu'il y a plus d'une possibilité
+function cutChoiceHTML(ar,nd,l,i){
+  if(!ar||ar.decoupable===false)return "";
+  const n=nd.sizes[0]; if(!nd.sizes.every(x=>x===n))return "";
+  const P=ar.pieces||{};
+  const cand=piecesTailles(ar).filter(t=>t>=n).sort((a,b)=>a-b);
+  if(cand.length<2)return "";
+  const sim=JSON.parse(JSON.stringify(ar)); const auto=takePiece(sim,n); // ce que ferait la règle automatique
+  const lib=t=>t===n?`prendre une ${PERS(t)} entière`:`entamer une ${PERS(t)} → reste ${Math.round((t-n)*100)/100}`;
+  return `<label class="stocknote info" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">Bûche à utiliser :
+    <select onchange="setCutSrc(${i},this.value)" aria-label="Bûche à entamer" style="font-size:12.5px;padding:4px 8px">
+      <option value="">Automatique — ${esc(auto?lib(auto.de):"stock insuffisant")}</option>
+      ${cand.map(t=>`<option value="${t}" ${Number(l.src)===t?"selected":""}>${esc(lib(t))} (${P[t]} en stock)</option>`).join("")}
+    </select></label>`;
+}
+function setCutSrc(i,v){ draft.lignes[i].src=v?Number(v):null; refreshStockNotes(); }
+function freeCut(i){ const l=draft.lignes[i]; l._free=true; l.src=(l.alloc&&l.alloc.src)||null; refreshStockNotes(); }
 function refreshStockNotes(){ const notes=draftStockNotes(); notes.forEach((h,i)=>{ const el=document.getElementById("sn_"+i); if(el)el.innerHTML=h; }); }
+
+/* ---------- Fiche de stock (solde restant, réservé, à produire) ---------- */
+function printStockFiche(){
+  const t=todayISO();
+  const arts=(CACHE.stock||[]).slice().sort((a,b)=>(a.nom||"").localeCompare(b.nom||"","fr"));
+  // ce qui est déjà sorti du stock pour les commandes à venir, et ce qui manque
+  const resa={}, manq={};
+  (CACHE.commandes||[]).filter(c=>livISO(c)>=t).forEach(c=>(CACHE._lignesByCmd[c["RéfCommande"]]||[]).forEach(l=>{
+    const a=l["StockAlloc"]; if(!a)return;
+    (a.pris||[]).forEach(p=>{ (resa[a.art]=resa[a.art]||[]).push(p.n); });
+    if((a.manque||[]).length)(manq[a.art]=manq[a.art]||[]).push({c,l,list:a.manque});
+  }));
+  const now=new Date().toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  let body=printHeaderHTML("Fiche de stock — "+now);
+  body+=arts.map(a=>{
+    const tailles=piecesTailles(a).sort((x,y)=>y-x);
+    const r=resa[a.id]||[], m=manq[a.id]||[];
+    return `<h3 class="labo-cat">${esc(a.nom)}</h3>
+      <table class="labo"><tbody>
+        <tr class="labo-prod"><td>Solde restant</td><td class="right" style="width:auto">${piecesNb(a)} pièce(s) · ${esc(PERS(piecesTotal(a)))}</td></tr>
+        ${tailles.length?tailles.map(s=>`<tr class="labo-det"><td>Bûche de ${esc(PERS(s))}</td><td class="right">${a.pieces[s]}</td></tr>`).join("")
+          :'<tr class="labo-det"><td>Stock vide</td><td class="right">0</td></tr>'}
+      </tbody></table>
+      ${r.length?`<p style="margin:6px 0 2px;font-size:13px">Déjà réservé pour les commandes à venir : <b>${esc(persList(r))}</b></p>`:""}
+      ${m.length?`<p style="margin:4px 0 2px;font-size:13px"><b>⚠ À produire (hors stock) :</b> ${m.map(x=>esc(frDate(livISO(x.c))+" "+clientNom(CACHE._cliById[x.c["RéfClient"]])+" ("+persList(x.list)+")")).join(" · ")}</p>`:""}`;
+  }).join("");
+  printModal("Fiche de stock",body,false);
+}
 
 /* ---------- Écran Stock ---------- */
 function stockManques(){ // commandes à venir dont un article n'a pas pu être pris en stock
@@ -2011,6 +2068,7 @@ function viewStock(){
   const liés=id=>(CACHE.produits||[]).filter(p=>p.StockArt===id).sort((a,b)=>(a["NomProduit"]||"").localeCompare(b["NomProduit"]||"","fr"));
   m.innerHTML=`
    <div class="row" style="align-items:center;margin-bottom:6px"><h1 style="margin:0" class="grow">Stock</h1>${helpBtn('stock')}
+     ${(CACHE.stock||[]).length?`<button class="btn big" onclick="printStockFiche()">Imprimer la fiche</button>`:""}
      <button class="btn primary big" onclick="editStockArticle()">+ Nouvel article</button></div>
    <p class="muted" style="margin-top:0">Chaque commande d'un produit lié retire automatiquement du stock, en coupant une pièce plus grande si besoin.</p>
    ${manques.length?`<div class="banner danger"><span style="font-size:20px">⚠</span><span class="grow"><b>${manques.length} article(s) commandé(s) hors stock</b> — à produire :
