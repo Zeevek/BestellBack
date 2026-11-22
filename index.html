@@ -188,7 +188,11 @@
   /* ---- Bon de fabrication : produit bien visible, détail par commande dessous ---- */
   .labo-cat{margin:16px 0 4px;padding-bottom:3px;border-bottom:2px solid #1a1109;font-size:17px;text-transform:uppercase;letter-spacing:.6px}
   table.labo{margin:0 0 6px;break-inside:avoid;page-break-inside:avoid}
-  table.labo td{border-bottom:0;padding:3px 6px;vertical-align:baseline}
+  table.labo td{border-bottom:0;padding:4px 6px;vertical-align:middle}
+  /* lignes claires pour suivre chaque commande jusqu'à sa quantité (imprimées aussi) */
+  .labo-det td{border-bottom:1px solid #d6d6d6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .labo-det:nth-child(odd) td{background:#f3f3f3}
+  .labo-det:last-child td{border-bottom:0!important}
   table.labo td.right{width:70px;white-space:nowrap}
   .labo-prod td{font-family:system-ui,"Segoe UI",Arial,sans-serif;font-weight:800;font-size:17px;color:#000;padding-top:9px!important;border-bottom:1px solid #bbb!important}
   .labo-prod td.right{font-size:20px}
