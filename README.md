@@ -39,6 +39,7 @@ tout l'historique de la maison (1979 → aujourd'hui) :
 | **Impressions** | Bon de fabrication labo, étiquettes 24/A4 (Agipa 119015), liste des commandes du jour |
 | **Clients** | Fiches, historique, reste dû |
 | **Produits** | Catalogue, catégories, bibliothèque de commentaires |
+| **Stock** | Pièces prêtes par taille (ex. bûches de 12 pers.), retrait automatique à la commande avec découpe (12 → 4 + 8) |
 | **Sauvegarde** | Export / import du fichier de données |
 
 ### Points de fonctionnement utiles

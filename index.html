@@ -53,15 +53,24 @@
   .brand{display:flex;flex-direction:column;line-height:1.05}
   .brand .name{font-family:Georgia,serif;font-size:22px;color:#fff}
   .brand .sub{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--caramel)}
-  nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  nav.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{
-    background:transparent;border:0;color:#e9dcc7;padding:9px 15px;border-radius:9px;
-    font-size:15px;opacity:.85
+    background:transparent;border:0;color:#e9dcc7;padding:8px 11px;border-radius:9px;
+    font-size:14.5px;opacity:.85;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;position:relative
   }
+  nav.tabs button svg{width:17px;height:17px;flex:none;opacity:.9}
   nav.tabs button:hover{background:rgba(255,255,255,.08);opacity:1}
   nav.tabs button.active{background:var(--caramel);color:#2c1a10;font-weight:600;opacity:1}
+  nav.tabs button .dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#e2553f;box-shadow:0 0 0 2px var(--choco)}
+  @media(max-width:1120px){
+    .top-row{flex-wrap:wrap;height:auto;padding:10px 0 0;gap:8px}
+    .brand .sub{display:none}
+    nav.tabs{margin-left:0;width:100%;padding-bottom:8px}
+  }
 
   main{max-width:1180px;margin:22px auto;padding:0 18px 80px}
+  @media(max-width:620px){ main{padding:0 12px 80px;margin-top:14px} h1{font-size:24px} .hide-sm{display:none} }
   .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--shadow)}
   .pad{padding:18px 20px}
   .row{display:flex;gap:14px;flex-wrap:wrap}
@@ -175,6 +184,93 @@
   .bon h2{margin:0}
   .bon table{margin-top:10px}
   .bon th,.bon td{border-bottom:1px solid #d9c9a9}
+
+  /* ---- Bon de fabrication : produit bien visible, détail par commande dessous ---- */
+  .labo-cat{margin:16px 0 4px;padding-bottom:3px;border-bottom:2px solid #1a1109;font-size:17px;text-transform:uppercase;letter-spacing:.6px}
+  table.labo{margin:0 0 6px;break-inside:avoid;page-break-inside:avoid}
+  table.labo td{border-bottom:0;padding:3px 6px;vertical-align:baseline}
+  table.labo td.right{width:70px;white-space:nowrap}
+  .labo-prod td{font-family:system-ui,"Segoe UI",Arial,sans-serif;font-weight:800;font-size:17px;color:#000;padding-top:9px!important;border-bottom:1px solid #bbb!important}
+  .labo-prod td.right{font-size:20px}
+  .labo-det td{font-family:system-ui,"Segoe UI",Arial,sans-serif;font-size:13.5px;color:#222}
+  .labo-det td:first-child{padding-left:22px}
+  .labo-det td.right{font-weight:700;font-size:14.5px}
+  .labo-det i{color:#444}
+  .labo-hr{display:inline-block;min-width:48px;color:#555;font-variant-numeric:tabular-nums}
+  .labo-coupe{font-size:12px;color:#6b4513;border:1px solid #d9b98a;border-radius:6px;padding:0 5px;margin-left:4px;white-space:nowrap}
+  @media print{ .labo-prod td{font-size:13pt} .labo-prod td.right{font-size:15pt} .labo-det td{font-size:10.5pt} .labo-det td.right{font-size:11pt} }
+
+  /* ---- Stock ---- */
+  .pieces{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .piece{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 12px}
+  .piece .t{font-family:Georgia,serif;font-size:18px;color:var(--choco)}
+  .piece .c{font-weight:700;background:var(--caramel);color:#2c1a10;border-radius:999px;padding:1px 9px;font-size:14px}
+  .piece.cut{border-style:dashed;border-color:#d9b98a}
+  .stocknote{font-size:12.5px;margin-top:3px}
+  .stocknote.ok{color:var(--ok)} .stocknote.warn{color:var(--danger);font-weight:600} .stocknote.info{color:var(--praline)}
+  .stock-card{margin-bottom:14px}
+  .stock-card h3{margin:0}
+
+  /* ---- Ergonomie : accessibilité, filtres, regroupements ---- */
+  :focus-visible{outline:2px solid var(--caramel);outline-offset:2px}
+  tbody tr[tabindex]:focus-visible{outline:2px solid var(--caramel);outline-offset:-2px;background:#fff8ec}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .tbl{overflow-x:auto}
+  .seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--cream);border:1px solid var(--line);border-radius:11px;padding:3px}
+  .seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-size:14px;color:var(--praline)}
+  .seg button:hover{background:#fff}
+  .seg button.on{background:#fff;color:var(--choco);font-weight:600;box-shadow:var(--shadow)}
+  .seg button .n{display:inline-block;min-width:20px;margin-left:5px;padding:0 6px;border-radius:999px;background:var(--line);font-size:12px;font-weight:600}
+  .seg button.on .n{background:var(--caramel);color:#2c1a10}
+  tr.dayhead td{background:var(--cream);font-family:Georgia,serif;font-size:15px;font-weight:600;color:var(--praline);padding:8px 12px;cursor:default}
+  tr.dayhead td .muted{font-family:system-ui,sans-serif;font-weight:400;font-size:13px}
+  tr.dayhead:hover{background:none}
+  .items-sum{font-size:13px;color:var(--muted);margin-top:2px;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hr{font-variant-numeric:tabular-nums;font-weight:600;color:var(--choco)}
+  .stat.accent{background:linear-gradient(180deg,#fff,var(--paper));border-color:#e2c79d}
+  .stat .sub{font-size:13px;color:var(--muted);margin-top:2px}
+  .stat.click{cursor:pointer} .stat.click:hover{border-color:var(--caramel)}
+
+  .banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;border-radius:12px;margin-bottom:16px;border:1px solid #ecc9a0;background:#fdf1e0;color:#6b4513}
+  .banner.danger{border-color:#e8c9c2;background:var(--dangerbg);color:var(--danger)}
+  .banner b{color:inherit}
+
+  /* Champ de recherche avec liste déroulante (client, produit) */
+  .combo{position:relative}
+  .combo input{width:100%}
+  .combo-list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(44,26,16,.18);max-height:300px;overflow:auto;z-index:5;display:none}
+  .combo-list.open{display:block}
+  .combo-opt{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f3ead9}
+  .combo-opt:last-child{border-bottom:0}
+  .combo-opt.hl,.combo-opt:hover{background:#fff4e2}
+  .combo-opt .sub{font-size:12.5px;color:var(--muted)}
+  .combo-opt.create{color:var(--caramel-d);font-weight:600}
+  .picked{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 8px 7px 12px;min-height:44px}
+  .picked .who{flex:1;min-width:0}
+  .picked .who small{display:block;color:var(--muted);font-size:12.5px}
+  .quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .quick button{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--praline)}
+  .quick button:hover{border-color:var(--caramel)}
+  .quick button.on{background:var(--caramel);border-color:var(--caramel-d);color:#2c1a10;font-weight:600}
+  .qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:9px;background:#fff;overflow:hidden}
+  .qty button{border:0;background:transparent;width:30px;height:38px;font-size:18px;color:var(--praline)}
+  .qty button:hover{background:#fff4e2}
+  .lignes .qty input[type=number]{border:0;border-radius:0;width:56px;padding:8px 2px;text-align:center;-moz-appearance:textfield}
+  .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .foot-total{margin-right:auto;display:flex;align-items:baseline;gap:8px;color:var(--muted)}
+  .foot-total b{font-family:Georgia,serif;font-size:22px;color:var(--choco)}
+  kbd{font:12px ui-monospace,Consolas,monospace;background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--praline)}
+  @media(max-width:620px){
+    .panel-body{padding:16px;max-height:none}
+    .overlay{padding:0}
+    .panel{border-radius:0;min-height:100%}
+    .lignes .hide-sm{display:none}
+    .lignes th,.lignes td{padding:8px 4px}
+    .lignes td:first-child{min-width:0!important}
+    .lignes .qty input[type=number]{width:34px}
+    .lignes .qty button{width:26px}
+    .panel-foot{padding:10px 16px}
+  }
 </style>
 </head>
 <body>
@@ -202,15 +298,16 @@
       <span class="name">BestellBack</span>
       <span class="sub">À la Tentation — gestion des commandes</span>
     </div>
-    <nav class="tabs" id="nav">
-      <button data-view="dash" class="active">Tableau de bord</button>
-      <button data-view="commandes">Commandes</button>
-      <button data-view="caisse">Caisse</button>
-      <button data-view="facturation">Facturation</button>
-      <button data-view="impressions">Impressions</button>
-      <button data-view="clients">Clients</button>
-      <button data-view="produits">Produits</button>
-      <button data-view="sauvegarde">Sauvegarde</button>
+    <nav class="tabs" id="nav" aria-label="Écrans">
+      <button data-view="dash" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Accueil</button>
+      <button data-view="commandes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Commandes</button>
+      <button data-view="caisse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>Caisse</button>
+      <button data-view="facturation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Facturation</button>
+      <button data-view="impressions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Impressions</button>
+      <button data-view="clients"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4a4 4 0 010 8M22 21c0-3-2-5-4-5.5"/></svg>Clients</button>
+      <button data-view="produits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16l-2 7H6z"/><path d="M6 14c0-4 2.7-7 6-7s6 3 6 7"/><circle cx="12" cy="4.5" r="1.8"/></svg>Produits</button>
+      <button data-view="stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/></svg>Stock</button>
+      <button data-view="sauvegarde"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg>Sauvegarde</button>
     </nav>
   </div>
 </header>
@@ -227,7 +324,7 @@
    Aucune connexion internet requise. Données stockées dans le navigateur.
    ================================================================= */
 
-const DB_NAME="ALaTentation", DB_VER=3;
+const DB_NAME="ALaTentation", DB_VER=4; // v4 : magasin « stock »
 // Tables du fichier source -> magasins IndexedDB
 const STORE_MAP={
   Client:"clients", Produit:"produits", Categorie:"categories", Commande:"commandes",
@@ -259,6 +356,7 @@ function openDB(){
       if(!db.objectStoreNames.contains("_autres")) db.createObjectStore("_autres",{keyPath:"_t"});
       if(!db.objectStoreNames.contains("documents")) db.createObjectStore("documents",{keyPath:"id"});
       if(!db.objectStoreNames.contains("commentaires")) db.createObjectStore("commentaires",{keyPath:"RéfCatégorie"});
+      if(!db.objectStoreNames.contains("stock")) db.createObjectStore("stock",{keyPath:"id"});
     };
     r.onsuccess=e=>res(e.target.result);
     r.onerror=e=>rej(e.target.error);
@@ -290,6 +388,8 @@ async function loadCache(){
   for(const s of ALL_STORES) CACHE[s]=await getAll(s);
   CACHE.documents=await getAll("documents");
   CACHE.commentaires=await getAll("commentaires");
+  CACHE.stock=await getAll("stock");
+  CACHE._stockById={}; (CACHE.stock||[]).forEach(a=>CACHE._stockById[a.id]=a);
   if(CACHE.installation && CACHE.installation[0]) SHOP=Object.assign({},SHOP,CACHE.installation[0]);
   // index pratiques
   CACHE._catById={}; (CACHE.categories||[]).forEach(c=>CACHE._catById[c["RéfCatégorie"]]=c);
@@ -311,7 +411,26 @@ const eur=n=>(Number(n)||0).toLocaleString("fr-FR",{style:"currency",currency:"E
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function frDate(iso){ if(!iso)return ""; const d=new Date(iso); if(isNaN(d))return iso;
   return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"}); }
-function todayISO(){return new Date().toISOString().slice(0,10);}
+// Date du jour en heure LOCALE (toISOString() est en UTC : entre minuit et 1-2 h,
+// l'application se croyait encore la veille — commandes de la veille « à venir », encaissements datés de la veille).
+function localISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayISO(){return localISO(new Date());}
+function addDaysISO(iso,n){ const [y,m,d]=iso.split("-").map(Number); return localISO(new Date(y,m-1,d+n)); }
+function dayLabel(iso){ // « Aujourd'hui », « Demain », sinon « samedi 28 novembre »
+  if(!iso)return "Sans date"; const t=todayISO();
+  if(iso===t)return "Aujourd'hui"; if(iso===addDaysISO(t,1))return "Demain"; if(iso===addDaysISO(t,-1))return "Hier";
+  const [y,m,d]=iso.split("-").map(Number); const dt=new Date(y,m-1,d);
+  const s=dt.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:y!==new Date().getFullYear()?"numeric":undefined});
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+function livISO(c){ return c&&c["DateExpédition"]?String(c["DateExpédition"]).slice(0,10):""; }
+function resumeLignes(ref,max){ // « 2× Fraisier · 12× Croissant »
+  const ls=CACHE._lignesByCmd[ref]||[]; max=max||4;
+  const parts=ls.slice(0,max).map(l=>(l["Quantité"]?(+l["Quantité"]).toLocaleString("fr-FR")+"× ":"")+ligneNom(l));
+  if(ls.length>max)parts.push("+"+(ls.length-max));
+  return parts.join(" · ");
+}
+const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); // recherche sans accents
 function heure(h){ if(!h)return""; h=String(h).padStart(4,"0"); return h.length>=4?h.slice(0,2)+"h"+h.slice(2,4):h; }
 function clientNom(c){ if(!c)return"(client inconnu)"; return [c["NomSociété"],c["PrénomContact"]].filter(Boolean).join(" ")||("Client n°"+c["RéfClient"]); }
 function ligneNom(l){ const p=CACHE._prodById[l["RéfProduit"]]; if(p)return p["NomProduit"]; return l["Libelle"]||"Produit(s) supplémentaire(s)"; }
@@ -368,35 +487,66 @@ function docNumero(type){ // FAC-2026-001 / DEV-2026-001
 const RECENT_DAYS=90;
 function isRecent(livISO){ if(!livISO)return false; const d=new Date(livISO.slice(0,10)); if(isNaN(d))return false;
   return (Date.now()-d.getTime())/86400000 <= RECENT_DAYS; }
-function toast(msg,err){ const t=document.getElementById("toast"); t.textContent=msg; t.className="show"+(err?" err":""); clearTimeout(t._t); t._t=setTimeout(()=>t.className="",2600); }
+function toast(msg,err){ const t=document.getElementById("toast"); t.textContent=msg; t.className="show"+(err?" err":""); clearTimeout(t._t); t._t=setTimeout(()=>t.className="",err?4000:2600); }
+function toastUndo(msg,undo){ // message avec bouton « Annuler » (5 s)
+  const t=document.getElementById("toast"); t.innerHTML=`${esc(msg)} <button type="button" style="margin-left:12px;background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:3px 10px">Annuler</button>`;
+  t.className="show"; clearTimeout(t._t); t._t=setTimeout(()=>t.className="",5000);
+  t.querySelector("button").onclick=()=>{ t.className=""; undo(); };
+}
 
 /* ---------- Modale ---------- */
-function modal(title,bodyHTML,footHTML){
-  const p=document.getElementById("panel");
-  p.innerHTML=`<div class="panel-head"><h2>${esc(title)}</h2><button class="x no-print" onclick="closeModal()">×</button></div>
+// opts.guard : fonction qui renvoie true si une saisie serait perdue (on demande alors confirmation)
+// opts.focus : sélecteur du champ à activer à l'ouverture
+let _modalGuard=null, _modalReturnFocus=null;
+function modal(title,bodyHTML,footHTML,opts){
+  opts=opts||{};
+  const ov=document.getElementById("overlay"), p=document.getElementById("panel");
+  if(!ov.classList.contains("open")) _modalReturnFocus=document.activeElement;
+  const scroll=(p.querySelector(".panel-body")||{}).scrollTop||0;
+  p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); p.setAttribute("aria-labelledby","panelTitle");
+  p.innerHTML=`<div class="panel-head"><h2 id="panelTitle">${esc(title)}</h2><button class="x no-print" aria-label="Fermer" title="Fermer (Échap)" onclick="tryCloseModal()">×</button></div>
     <div class="panel-body">${bodyHTML}</div>
     <div class="panel-foot no-print">${footHTML||'<button class="btn" onclick="closeModal()">Fermer</button>'}</div>`;
-  document.getElementById("overlay").classList.add("open");
+  _modalGuard=opts.guard||null;
+  if(opts.keepScroll) p.querySelector(".panel-body").scrollTop=scroll;
+  ov.classList.add("open");
   document.body.classList.add("modal-open");
+  const f=opts.focus?p.querySelector(opts.focus):null;
+  if(f) f.focus(); // immédiat : les premières lettres tapées ne doivent pas se perdre
+  else if(!opts.keepScroll) setTimeout(()=>{ const b=p.querySelector(".panel-foot .btn.primary")||p.querySelector(".x"); if(b)b.focus({preventScroll:true}); },30);
 }
-function closeModal(){document.getElementById("overlay").classList.remove("open");document.body.classList.remove("modal-open","printing-labels");}
+function closeModal(){
+  _modalGuard=null;
+  document.getElementById("overlay").classList.remove("open");document.body.classList.remove("modal-open","printing-labels");
+  if(_modalReturnFocus&&document.body.contains(_modalReturnFocus)) try{_modalReturnFocus.focus({preventScroll:true});}catch(e){}
+  _modalReturnFocus=null;
+}
+// Fermeture « douce » (clic à côté, Échap, ×, Annuler) : ne perd jamais une saisie sans prévenir.
+function tryCloseModal(){
+  if(_modalGuard&&_modalGuard()&&!confirm("Abandonner la saisie en cours ?\nLes informations non enregistrées seront perdues."))return;
+  closeModal();
+}
 
 /* ---------- Aide contextuelle ---------- */
 const HELP={
- dash:{t:"Aide — Tableau de bord",h:`<p>C'est l'écran d'accueil. Il donne un aperçu rapide.</p>
-   <ul><li><b>Les compteurs</b> en haut : nombre de commandes, de clients, de produits, et de commandes à venir.</li>
-   <li><b>Commandes à venir</b> : les prochaines livraisons, triées par date. Cliquez sur une ligne pour ouvrir la commande.</li>
-   <li><b>+ Nouvelle commande</b> : pour saisir une commande tout de suite.</li>
-   <li><b>Vente directe</b> : pour une vente au comptoir, sans commande (voir l'aide de l'écran Caisse).</li></ul>
-   <p class="muted">Astuce : au tout début, « à venir » peut être vide — c'est normal, il se remplit dès que vous saisissez des commandes avec une date de livraison future.</p>`},
+ dash:{t:"Aide — Accueil",h:`<p>L'écran d'accueil montre la journée en un coup d'œil.</p>
+   <ul><li><b>Les quatre cases</b> du haut : les commandes à livrer aujourd'hui, celles de demain, ce qui a été encaissé aujourd'hui et ce qui reste à encaisser sur les commandes à venir. <b>Cliquez sur une case</b> pour ouvrir la liste correspondante.</li>
+   <li><b>Prochaines livraisons</b> : regroupées par jour (Aujourd'hui, Demain…), avec l'heure, le contenu et le règlement. Cliquez sur une ligne pour ouvrir la commande.</li>
+   <li><b>+ Nouvelle commande</b> (ou la touche <kbd>N</kbd>) : pour saisir une commande tout de suite.</li>
+   <li><b>Vente directe</b> : pour une vente au comptoir, sans commande (voir l'aide de l'écran Caisse).</li>
+   <li><b>Bandeau « Sauvegarde »</b> : il apparaît quand la dernière sauvegarde date de plus d'un jour. Un clic sur « Sauvegarder maintenant » suffit.</li></ul>`},
  commandes:{t:"Aide — Commandes",h:`<p>Ici vous gérez toutes les commandes.</p>
-   <ul><li><b>Rechercher</b> : tapez un nom de client ou un numéro de commande.</li>
-   <li><b>À venir / Toutes</b> : filtre pour voir seulement les livraisons à venir, ou l'historique complet.</li>
-   <li><b>Ouvrir une commande</b> : cliquez sur une ligne. Vous verrez le détail, et pourrez l'encaisser, créer une facture/un devis, imprimer le bon, modifier ou supprimer.</li>
-   <li><b>+ Nouvelle commande</b> : choisissez le client (ou créez-le), la date et l'heure de livraison, puis ajoutez les produits avec quantités. Le prix se remplit automatiquement depuis le catalogue.</li>
-   <li><b>+ Produit supplémentaire</b> : pour un achat spontané ajouté à la commande, avec un libellé et un montant libres (par défaut « Produit(s) supplémentaire(s) »).</li>
-   <li><b>Commentaire</b> : sous chaque article, un champ permet de préciser une variante (ex. « sans fromage »). En cliquant dans le champ, vous retrouvez les commentaires déjà utilisés, pour réutiliser toujours la même formulation. Ces commentaires sont repris sur le bon labo (décompte séparé) et sur les étiquettes.</li>
-   <li><b>Règlement</b> : à la création, indiquez si la commande est <b>Non payée</b>, réglée par <b>Acompte</b> (avec le montant) ou <b>Payée</b> en totalité, et le moyen de paiement. Ce statut apparaît sur la liste des commandes du jour et dans la Caisse.</li></ul>`},
+   <ul><li><b>Rechercher</b> (touche <kbd>/</kbd>) : nom du client, numéro de commande ou nom d'un produit. Les accents ne comptent pas : « fete » trouve « FÊTES ».</li>
+   <li><b>Filtres</b> : Aujourd'hui, Demain, À venir, À encaisser (commandes à venir pas encore réglées) ou Toutes. Le chiffre indique combien de commandes chaque filtre contient.</li>
+   <li><b>Ouvrir une commande</b> : cliquez sur une ligne. Vous pouvez l'encaisser, imprimer le bon, créer une facture ou un devis, la modifier ou la supprimer.</li>
+   <li><b>Nouvelle commande — le client</b> : tapez quelques lettres du nom (ou le téléphone), puis choisissez dans la liste. S'il n'existe pas, choisissez « + Nouveau client » : il est créé sans quitter la commande.</li>
+   <li><b>La date</b> : les boutons « Aujourd'hui », « Demain », « Mer 26 »… remplissent la date en un clic.</li>
+   <li><b>Les produits</b> : tapez le début du nom dans « Ajouter un produit » puis <kbd>Entrée</kbd> (flèches <kbd>↑</kbd> <kbd>↓</kbd> pour choisir). Le champ reste prêt pour le produit suivant. Sans rien taper, la liste propose les produits les plus commandés. Ajouter deux fois le même produit augmente la quantité.</li>
+   <li><b>Quantités</b> : boutons <b>−</b> et <b>+</b>, ou saisie directe. Le total se met à jour immédiatement, en bas de la fenêtre.</li>
+   <li><b>Article libre</b> : pour un article hors catalogue, avec un libellé et un prix libres.</li>
+   <li><b>Commentaire</b> : sous chaque article (ex. « sans fromage »). Les commentaires déjà utilisés sont proposés. Ils sont repris sur le bon labo et les étiquettes.</li>
+   <li><b>Règlement</b> : à la création, indiquez <b>Non payée</b>, <b>Acompte</b> (avec le montant) ou <b>Payée</b>, et le moyen de paiement.</li>
+   <li><b>Enregistrer</b> : bouton en bas, ou <kbd>Ctrl</kbd> + <kbd>Entrée</kbd>. Si vous fermez la fenêtre par erreur (clic à côté, Échap), l'application demande confirmation avant de perdre la saisie.</li></ul>`},
  caisse:{t:"Aide — Caisse",h:`<p>L'écran se présente en deux colonnes.</p>
    <ul><li><b>À gauche — En attente</b> : les commandes pas encore réglées. Une <b>barre de recherche</b> permet de filtrer par nom de client. Cliquez sur « Encaisser ».</li>
    <li><b>À droite — Payées</b> : les factures réglées à la date choisie en haut (avec le moyen de paiement et le montant).</li>
@@ -428,6 +578,14 @@ const HELP={
    <li><b>Catégories</b> : le bouton « Catégories » permet d'ajouter, renommer ou supprimer les familles de produits.</li>
    <li><b>Commentaires</b> : le bouton « Commentaires » ouvre une bibliothèque de commentaires types <b>par catégorie</b> (ex. « sans fromage » pour les fours salés). Ils sont proposés automatiquement en commande, et tout nouveau commentaire saisi en commande s'ajoute tout seul à la bibliothèque de la catégorie du produit.</li></ul>
    <p class="muted">Le prix saisi ici est proposé automatiquement lors de la prise de commande (modifiable au cas par cas).</p>`},
+ stock:{t:"Aide — Stock",h:`<p>Le stock suit les pièces prêtes (bûches, entremets…) <b>par taille</b>, en nombre de personnes.</p>
+   <ul><li><b>Créer un article</b> : « + Nouvel article », par exemple « Bûche Exotique », avec un stock de départ (ex. 15 pièces de 12 pers.).</li>
+   <li><b>Lier les produits</b> : dans la même fenêtre, cochez les produits qui puisent dans ce stock (ex. « Bûche exotique 4 pers. », « 6 pers. », « 12 pers. ») et indiquez la taille de chacun. Si le produit est vendu « à la part », laissez la taille vide : la quantité saisie en commande sera le nombre de personnes.</li>
+   <li><b>À chaque commande</b>, la bonne taille est retirée du stock. S'il n'y en a pas, une pièce plus grande est <b>coupée automatiquement</b> : pour une bûche de 4 prise sur une 12, la 4 part en commande et une 8 revient en stock. Pour une 6 : une 12 devient deux 6, l'une part en commande.</li>
+   <li>Le formulaire de commande montre <b>à l'avance</b> ce qui va se passer (✓ prise directe, ✂ découpe, ⚠ stock insuffisant). Une commande hors stock est quand même enregistrée, et signalée ici en haut de l'écran.</li>
+   <li><b>Modifier ou supprimer une commande</b> rend les pièces au stock. Si la découpe n'a plus lieu d'être (la 8 est toujours là), la bûche de 12 est reformée.</li>
+   <li><b>Entrées</b> : « Ajouter » après une fournée ; boutons − et + sur chaque taille pour corriger. Tous les mouvements sont listés dans « Derniers mouvements ».</li>
+   <li>Le <b>bon de fabrication</b> indique les découpes à faire (✂ couper 12 → 4).</li></ul>`},
  sauvegarde:{t:"Aide — Sauvegarde",h:`<p>Le plus important pour ne jamais rien perdre.</p>
    <ul><li><b>Télécharger la sauvegarde</b> : crée un fichier de secours avec toutes vos données. À faire régulièrement, et à copier sur une clé USB.</li>
    <li><b>Restaurer</b> : recharge les données depuis un fichier de sauvegarde (par exemple sur un nouvel ordinateur).</li></ul>
@@ -435,8 +593,26 @@ const HELP={
 };
 function helpBtn(view){ return `<button class="btn no-print" title="Aide de cet écran" onclick="showHelp('${view}')" style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--caramel);color:#2c1a10;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif">?</span> Aide</button>`; }
 function showHelp(view){ const x=HELP[view]||HELP.dash; modal(x.t,x.h,`<button class="btn primary" onclick="closeModal()">J'ai compris</button>`); }
-document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeModal();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")tryCloseModal();});
+document.addEventListener("keydown",e=>{
+  const open=document.getElementById("overlay").classList.contains("open");
+  if(e.key==="Escape"){
+    if(document.querySelector(".combo-list.open")){ closeCombos(); return; } // Échap ferme d'abord la liste déroulante
+    if(open)tryCloseModal(); return;
+  }
+  // Ctrl + Entrée : valide la fenêtre ouverte (bouton principal)
+  if(open&&(e.ctrlKey||e.metaKey)&&e.key==="Enter"){ const b=document.querySelector("#panel .panel-foot .btn.primary"); if(b){e.preventDefault();b.click();} return; }
+  // Lignes de tableau cliquables : activables au clavier (Entrée / Espace)
+  if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("tr[tabindex]")){ e.preventDefault(); e.target.click(); return; }
+  // Raccourcis, hors saisie : N = nouvelle commande, / = rechercher
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||""))||e.target.isContentEditable;
+  if(typing||open||e.ctrlKey||e.metaKey||e.altKey||document.getElementById("app").style.display==="none")return;
+  if(e.key==="n"||e.key==="N"){ e.preventDefault(); newCommande(); }
+  else if(e.key==="/"){ const s=document.querySelector("#main input[type=search]"); if(s){e.preventDefault();s.focus();s.select();} }
+});
+// Rend focusables (Tab) toutes les lignes cliquables, quel que soit l'écran qui les a dessinées.
+new MutationObserver(()=>{ document.querySelectorAll("tbody tr[onclick]:not([tabindex])").forEach(tr=>{ if(tr.getAttribute("onclick"))tr.tabIndex=0; }); })
+  .observe(document.body,{childList:true,subtree:true});
 
 /* =================================================================
    IMPORT INITIAL
@@ -461,6 +637,7 @@ async function importData(data,st){
     const rows=Array.isArray(tval)?tval:(tval&&tval.lignes)?tval.lignes:null;
     if(!rows){continue;}
     if(tname==="documents"){ await clearStore("documents"); await putAll("documents",rows.filter(r=>r&&r.id!=null)); continue; }
+    if(tname==="stock"){ await clearStore("stock"); await putAll("stock",rows.filter(r=>r&&r.id!=null)); continue; }
     if(tname==="commentaires"){ await clearStore("commentaires"); await putAll("commentaires",rows.filter(r=>r&&r["RéfCatégorie"]!=null)); continue; }
     let store=STORE_MAP[tname]||(ALL_STORES.includes(tname)?tname:null);
     if(store){
@@ -486,56 +663,91 @@ let VIEW="dash";
 document.getElementById("nav").addEventListener("click",e=>{
   const b=e.target.closest("button[data-view]"); if(!b)return;
   VIEW=b.dataset.view;
-  [...document.querySelectorAll("#nav button")].forEach(x=>x.classList.toggle("active",x===b));
+  [...document.querySelectorAll("#nav button")].forEach(x=>{x.classList.toggle("active",x===b); if(x===b)x.setAttribute("aria-current","page"); else x.removeAttribute("aria-current");});
+  window.scrollTo(0,0); b.scrollIntoView({block:"nearest",inline:"nearest"});
   render();
 });
-function render(){ ({dash:viewDash,commandes:viewCommandes,caisse:viewCaisse,facturation:viewFacturation,impressions:viewImpressions,clients:viewClients,produits:viewProduits,sauvegarde:viewSauvegarde}[VIEW]||viewDash)(); }
+function render(){ ({dash:viewDash,commandes:viewCommandes,caisse:viewCaisse,facturation:viewFacturation,impressions:viewImpressions,clients:viewClients,produits:viewProduits,stock:viewStock,sauvegarde:viewSauvegarde}[VIEW]||viewDash)(); }
 
 /* ---------- Tableau de bord ---------- */
+function goView(v){ const b=document.querySelector(`#nav [data-view="${v}"]`); if(b)b.click(); }
+function cmdsLivrees(iso){ return (CACHE.commandes||[]).filter(c=>!c["VenteDirecte"]&&livISO(c)===iso); }
+let LAST_BACKUP=null; // horodatage (ms) de la dernière sauvegarde téléchargée
+function backupBanner(){
+  const j=LAST_BACKUP?Math.floor((Date.now()-LAST_BACKUP)/86400000):null;
+  if(j!==null&&j<1)return "";
+  const msg=j===null?"<b>Aucune sauvegarde enregistrée sur cet appareil.</b> En cas de panne, toutes les données seraient perdues."
+    :`<b>Dernière sauvegarde il y a ${j} jour${j>1?"s":""}.</b> Pensez à la faire chaque soir et à la copier sur la clé USB.`;
+  return `<div class="banner ${j===null||j>=7?'danger':''}" role="status"><span style="font-size:20px">💾</span><span class="grow">${msg}</span>
+    <button class="btn sm primary" onclick="doBackup()">Sauvegarder maintenant</button></div>`;
+}
+function refreshBackupDot(){
+  const b=document.querySelector('#nav [data-view="sauvegarde"]'); if(!b)return;
+  const late=!LAST_BACKUP||(Date.now()-LAST_BACKUP)>=86400000;
+  let d=b.querySelector(".dot"); if(late&&!d){d=document.createElement("span");d.className="dot";d.title="Sauvegarde à faire";b.appendChild(d);} else if(!late&&d)d.remove();
+}
 function viewDash(){
   const m=document.getElementById("main");
-  const today=todayISO();
-  const avenir=(CACHE.commandes||[]).filter(c=>!c["VenteDirecte"] && c["DateExpédition"]&&c["DateExpédition"].slice(0,10)>=today)
-    .sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||"")).slice(0,40);
+  const today=todayISO(), demain=addDaysISO(today,1);
+  const avenirAll=(CACHE.commandes||[]).filter(c=>!c["VenteDirecte"] && livISO(c)>=today)
+    .sort((a,b)=>(livISO(a)+String(a["Heure"]||"9999")).localeCompare(livISO(b)+String(b["Heure"]||"9999")));
+  const avenir=avenirAll.slice(0,40);
+  const auj=cmdsLivrees(today), dem=cmdsLivrees(demain);
+  const ajdTotal=auj.reduce((s,c)=>s+cmdTotal(c["RéfCommande"]),0);
+  const ajdReste=auj.reduce((s,c)=>s+Math.max(0,cmdReste(c["RéfCommande"])),0);
+  const encJour=(CACHE.paiements||[]).filter(p=>String(p["DatePaiement"]||"").slice(0,10)===today).reduce((s,p)=>s+(Number(p["MontantPaiement"])||0),0);
+  const resteAvenir=avenirAll.reduce((s,c)=>s+Math.max(0,cmdReste(c["RéfCommande"])),0);
+  const dateLong=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
   m.innerHTML=`
+   ${backupBanner()}
    <div class="row" style="align-items:flex-end;margin-bottom:18px">
-     <div class="grow"><h1 style="margin:0 0 2px">Bonjour 👋</h1>
-       <div class="muted">${esc(SHOP.NomSociété)} — ${esc(SHOP.Activité||"")}</div></div>
+     <div class="grow"><h1 style="margin:0 0 2px">Bonjour</h1>
+       <div class="muted">${esc(dateLong.charAt(0).toUpperCase()+dateLong.slice(1))} — ${esc(SHOP.NomSociété)}</div></div>
      ${helpBtn('dash')}
      <button class="btn big" onclick="venteDirecte()">Vente directe</button>
-     <button class="btn primary big" onclick="newCommande()">+ Nouvelle commande</button>
+     <button class="btn primary big" onclick="newCommande()" title="Raccourci : touche N">+ Nouvelle commande</button>
    </div>
    <div class="stats" style="margin-bottom:18px">
-     <div class="card stat"><div class="n">${(CACHE.commandes||[]).length.toLocaleString("fr-FR")}</div><div class="l">Commandes</div></div>
-     <div class="card stat"><div class="n">${(CACHE.clients||[]).length.toLocaleString("fr-FR")}</div><div class="l">Clients</div></div>
-     <div class="card stat"><div class="n">${(CACHE.produits||[]).length.toLocaleString("fr-FR")}</div><div class="l">Produits</div></div>
-     <div class="card stat"><div class="n">${avenir.length}</div><div class="l">Commandes à venir</div></div>
+     <div class="card stat accent click" tabindex="0" role="button" onclick="cmdFilter.mode='auj';cmdFilter.q='';goView('commandes')" onkeydown="if(event.key==='Enter')this.click()">
+       <div class="l">À livrer aujourd'hui</div><div class="n">${auj.length}</div>
+       <div class="sub">${auj.length?eur(ajdTotal)+(ajdReste>0.005?" · "+eur(ajdReste)+" à encaisser":" · tout est réglé"):"aucune commande"}</div></div>
+     <div class="card stat click" tabindex="0" role="button" onclick="cmdFilter.mode='dem';cmdFilter.q='';goView('commandes')" onkeydown="if(event.key==='Enter')this.click()">
+       <div class="l">Demain</div><div class="n">${dem.length}</div><div class="sub">${dem.length?eur(dem.reduce((s,c)=>s+cmdTotal(c["RéfCommande"]),0)):"aucune commande"}</div></div>
+     <div class="card stat click" tabindex="0" role="button" onclick="viewCaisse._date=todayISO();goView('caisse')" onkeydown="if(event.key==='Enter')this.click()">
+       <div class="l">Encaissé aujourd'hui</div><div class="n">${eur(encJour)}</div><div class="sub">voir la caisse</div></div>
+     <div class="card stat click" tabindex="0" role="button" onclick="cmdFilter.mode='impayees';cmdFilter.q='';goView('commandes')" onkeydown="if(event.key==='Enter')this.click()">
+       <div class="l">Reste à encaisser</div><div class="n">${eur(resteAvenir)}</div><div class="sub">sur les ${avenirAll.length} commande(s) à venir</div></div>
    </div>
    <div class="card">
-     <div class="pad" style="border-bottom:1px solid var(--line);display:flex;align-items:center">
-       <h2 style="margin:0">Commandes à venir</h2>
-       <button class="btn sm" style="margin-left:auto" onclick="document.querySelector('[data-view=commandes]').click()">Voir toutes</button>
+     <div class="pad" style="border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+       <h2 style="margin:0" class="grow">Prochaines livraisons</h2>
+       ${auj.length?`<button class="btn sm" onclick="viewImpressions._date=todayISO();goView('impressions')">Impressions du jour</button>`:""}
+       <button class="btn sm" onclick="cmdFilter.mode='avenir';goView('commandes')">Tout voir</button>
      </div>
-     ${avenir.length? table_commandes(avenir) :
-       `<div class="empty"><div class="big">Aucune commande à venir</div>Les prochaines livraisons s'afficheront ici.</div>`}
+     ${avenir.length? table_commandes(avenir,{group:true}) :
+       `<div class="empty"><div class="big">Aucune commande à venir</div>Les prochaines livraisons s'afficheront ici.<div style="margin-top:14px"><button class="btn primary" onclick="newCommande()">+ Saisir une commande</button></div></div>`}
    </div>`;
 }
 
-function table_commandes(list){
-  const today=todayISO();
-  return `<table><thead><tr><th>N°</th><th>Livraison</th><th>Client</th><th class="right">Articles</th><th class="right">Total</th></tr></thead><tbody>${
-    list.map(c=>{
-      const liv=c["DateExpédition"]?c["DateExpédition"].slice(0,10):"";
-      const soon=liv&&liv>=today;
-      const nbl=(CACHE._lignesByCmd[c["RéfCommande"]]||[]).length;
-      return `<tr onclick="openCommande(${c["RéfCommande"]})">
-        <td class="nowrap"><b>${c["RéfCommande"]}</b></td>
-        <td class="nowrap"><span class="chip ${soon?'soon':''}">${frDate(liv)} ${esc(heure(c["Heure"]))}</span></td>
-        <td>${esc(clientNom(CACHE._cliById[c["RéfClient"]]))}</td>
-        <td class="right">${nbl}</td>
-        <td class="right nowrap"><b>${eur(cmdTotal(c["RéfCommande"]))}</b></td></tr>`;
-    }).join("")
-  }</tbody></table>`;
+// Tableau des commandes. opts.group : intercale un en-tête par jour de livraison.
+function table_commandes(list,opts){
+  opts=opts||{};
+  let last=null; const rows=[];
+  list.forEach(c=>{
+    const ref=c["RéfCommande"], liv=livISO(c);
+    if(opts.group&&liv!==last){
+      last=liv; const jour=list.filter(x=>livISO(x)===liv);
+      rows.push(`<tr class="dayhead"><td colspan="4">${esc(dayLabel(liv))} <span class="muted">· ${jour.length} commande${jour.length>1?"s":""} · ${eur(jour.reduce((s,x)=>s+cmdTotal(x["RéfCommande"]),0))}</span></td></tr>`);
+    }
+    rows.push(`<tr onclick="openCommande(${ref})">
+      <td class="nowrap">${opts.group?`<span class="hr">${esc(heure(c["Heure"]))||'<span class="muted">—</span>'}</span>`
+        :`<span class="hr">${esc(dayLabel(liv))}</span><div class="muted" style="font-size:12.5px">${frDate(liv)} ${esc(heure(c["Heure"]))}</div>`}</td>
+      <td><b>${esc(clientNom(CACHE._cliById[c["RéfClient"]]))}</b> <span class="muted" style="font-size:12.5px">n°${ref}</span>
+        <div class="items-sum">${esc(resumeLignes(ref))}</div></td>
+      <td class="hide-sm">${statutChip(ref)}</td>
+      <td class="right nowrap"><b>${eur(cmdTotal(ref))}</b></td></tr>`);
+  });
+  return `<div class="tbl"><table><thead><tr><th>${opts.group?"Heure":"Livraison"}</th><th>Client · contenu</th><th class="hide-sm">Règlement</th><th class="right">Total</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
 }
 
 /* ---------- Commandes ---------- */
@@ -550,43 +762,55 @@ function viewCommandes(){
    </div>
    <div class="card pad" style="margin-bottom:16px">
      <div class="row" style="align-items:center">
-       <div class="search grow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-         <input id="cq" type="search" placeholder="Rechercher : nom de client ou n° de commande…" value="${esc(cmdFilter.q)}"></div>
-       <select id="cmode">
-         <option value="avenir">À venir</option>
-         <option value="all">Toutes</option>
-       </select>
+       <div class="search grow" style="min-width:220px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+         <input id="cq" type="search" placeholder="Nom de client, n° de commande ou produit…  ( / )" value="${esc(cmdFilter.q)}" aria-label="Rechercher une commande"></div>
+       <div class="seg" id="cmode" role="group" aria-label="Filtrer les commandes"></div>
      </div>
    </div>
    <div class="card" id="cmdList"></div>`;
-  const cq=document.getElementById("cq"), cmode=document.getElementById("cmode");
-  cmode.value=cmdFilter.mode;
-  const run=()=>{cmdFilter.q=cq.value;cmdFilter.mode=cmode.value;cmdPage=1;renderCmdList();};
-  cq.addEventListener("input",run); cmode.addEventListener("change",run);
+  const cq=document.getElementById("cq");
+  cq.addEventListener("input",()=>{cmdFilter.q=cq.value;cmdPage=1;renderCmdList();});
+  document.getElementById("cmode").addEventListener("click",e=>{const b=e.target.closest("button[data-m]");if(!b)return;cmdFilter.mode=b.dataset.m;cmdPage=1;renderCmdList();});
   renderCmdList();
 }
-function gotoCmdPage(p){cmdPage=p;renderCmdList();}
+function gotoCmdPage(p){cmdPage=p;renderCmdList();window.scrollTo({top:0,behavior:"smooth"});}
+const CMD_MODES=[["auj","Aujourd'hui"],["dem","Demain"],["avenir","À venir"],["impayees","À encaisser"],["all","Toutes"]];
+function cmdModeFilter(mode){
+  const t=todayISO(), d=addDaysISO(t,1);
+  return {
+    auj:c=>!c["VenteDirecte"]&&livISO(c)===t,
+    dem:c=>!c["VenteDirecte"]&&livISO(c)===d,
+    avenir:c=>!c["VenteDirecte"]&&livISO(c)>=t,
+    impayees:c=>!c["VenteDirecte"]&&livISO(c)>=t&&cmdReste(c["RéfCommande"])>0.005,
+    all:()=>true
+  }[mode]||(()=>true);
+}
 function renderCmdList(){
-  const today=todayISO(); const q=cmdFilter.q.trim().toLowerCase();
-  let list=(CACHE.commandes||[]).slice();
-  if(cmdFilter.mode==="avenir") list=list.filter(c=>!c["VenteDirecte"] && c["DateExpédition"]&&c["DateExpédition"].slice(0,10)>=today);
-  if(q){
-    list=list.filter(c=>{
-      if(String(c["RéfCommande"]).includes(q))return true;
-      const cl=CACHE._cliById[c["RéfClient"]];
-      return cl&&clientNom(cl).toLowerCase().includes(q);
-    });
-  }
-  list.sort((a,b)=>(b["DateExpédition"]||"").localeCompare(a["DateExpédition"]||""));
-  if(cmdFilter.mode==="avenir") list.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
+  const q=norm(cmdFilter.q.trim());
+  const match=c=>{
+    if(!q)return true;
+    if(String(c["RéfCommande"]).includes(q))return true;
+    const cl=CACHE._cliById[c["RéfClient"]];
+    if(cl&&norm(clientNom(cl)).includes(q))return true;
+    return q.length>=3&&(CACHE._lignesByCmd[c["RéfCommande"]]||[]).some(l=>norm(ligneNom(l)).includes(q));
+  };
+  const base=(CACHE.commandes||[]).filter(match);
+  // pastilles de filtre avec leur compteur (tient compte de la recherche)
+  const seg=document.getElementById("cmode");
+  if(seg) seg.innerHTML=CMD_MODES.map(([k,l])=>`<button type="button" data-m="${k}" class="${cmdFilter.mode===k?'on':''}" aria-pressed="${cmdFilter.mode===k}">${l}${k!=="all"?`<span class="n">${base.filter(cmdModeFilter(k)).length}</span>`:""}</button>`).join("");
+  let list=base.filter(cmdModeFilter(cmdFilter.mode));
+  const asc=["auj","dem","avenir","impayees"].includes(cmdFilter.mode);
+  const key=c=>livISO(c)+String(c["Heure"]||"9999");
+  list.sort((a,b)=>asc?key(a).localeCompare(key(b)):key(b).localeCompare(key(a))||b["RéfCommande"]-a["RéfCommande"]);
   const total=list.length;
   const pages=Math.max(1,Math.ceil(total/CMD_PAGE_SIZE));
   if(cmdPage>pages)cmdPage=pages; if(cmdPage<1)cmdPage=1;
   const startI=(cmdPage-1)*CMD_PAGE_SIZE;
   const pageItems=list.slice(startI,startI+CMD_PAGE_SIZE);
   const el=document.getElementById("cmdList");
-  el.innerHTML= total? `<div class="pad muted" style="border-bottom:1px solid var(--line)">${total.toLocaleString("fr-FR")} commande(s) — affichées ${startI+1}–${startI+pageItems.length}</div>`+table_commandes(pageItems)+pagerBar(cmdPage,pages,"gotoCmdPage")
-    : `<div class="empty"><div class="big">Aucune commande trouvée</div>Modifiez votre recherche ou créez une nouvelle commande.</div>`;
+  const vide={auj:"Aucune commande à livrer aujourd'hui",dem:"Aucune commande pour demain",avenir:"Aucune commande à venir",impayees:"Tout est réglé",all:"Aucune commande trouvée"}[cmdFilter.mode];
+  el.innerHTML= total? `<div class="pad muted" style="border-bottom:1px solid var(--line)">${total.toLocaleString("fr-FR")} commande(s)${pages>1?` — affichées ${startI+1}–${startI+pageItems.length}`:""}</div>`+table_commandes(pageItems,{group:asc})+pagerBar(cmdPage,pages,"gotoCmdPage")
+    : `<div class="empty"><div class="big">${q?"Aucune commande trouvée":vide}</div>${q?"Essayez un autre nom, ou cherchez dans « Toutes ».":""}<div style="margin-top:14px"><button class="btn primary" onclick="newCommande()">+ Nouvelle commande</button></div></div>`;
 }
 
 function openCommande(ref){
@@ -608,7 +832,7 @@ function openCommande(ref){
    </div>
    <table><thead><tr><th>Produit</th><th class="right">Qté</th><th class="right">P.U.</th><th class="right">Total</th></tr></thead><tbody>${
      ls.map(l=>{const p=CACHE._prodById[l["RéfProduit"]];const t=(Number(l["Quantité"])||0)*(Number(l["PrixUnitaires"])||0)*(1-(Number(l["Remise"])||0));
-       return `<tr style="cursor:default"><td>${esc(ligneNom(l))}${l["Commentaire"]?'<div class="muted" style="font-size:13px">'+esc(l["Commentaire"])+'</div>':''}</td>
+       return `<tr style="cursor:default"><td>${esc(ligneNom(l))}${l["Commentaire"]?'<div class="muted" style="font-size:13px">'+esc(l["Commentaire"])+'</div>':''}${l["StockAlloc"]?'<div class="stocknote '+((l["StockAlloc"].manque||[]).length?'warn':'ok')+'">Stock : '+esc(allocDesc(l["StockAlloc"]))+'</div>':''}</td>
        <td class="right">${l["Quantité"]}</td><td class="right">${eur(l["PrixUnitaires"])}</td><td class="right"><b>${eur(t)}</b></td></tr>`;}).join("")
    }</tbody><tfoot><tr><td colspan="3" class="right"><b>Total</b></td><td class="right ttot">${eur(cmdTotal(ref))}</td></tr></tfoot></table>
    ${(function(){const c=CACHE._cmdById[ref]||{};const remise=Number(c["Remise"])||0;const paye=cmdPaye(ref),reste=cmdReste(ref);const ps=paysOf(ref);
@@ -621,18 +845,21 @@ function openCommande(ref){
            <button class="btn ghost sm" title="Supprimer cet encaissement" onclick="deletePaiement(${p["RéfPaiement"]})">✕</button>
          </div>`).join("")}</div>`:'<div class="muted" style="margin-top:6px">Aucun encaissement.</div>'}
      </div>`;})()}`;
-  const foot=`<button class="btn danger" onclick="deleteCommande(${ref})">Supprimer</button>
-    <button class="btn" onclick="encaisser(${ref})">Encaisser</button>
+  const aRegler=cmdReste(ref)>0.005;
+  const foot=`<button class="btn danger" style="margin-right:auto" onclick="deleteCommande(${ref})">Supprimer</button>
+    <button class="btn" onclick="printBon(${ref})">Bon</button>
     <button class="btn" onclick="makeDocument(${ref},'devis')">Devis</button>
     <button class="btn" onclick="makeDocument(${ref},'facture')">Facture</button>
-    <button class="btn" onclick="printBon(${ref})">Bon</button>
-    <button class="btn primary" onclick="newCommande(${ref})">Modifier</button>`;
-  modal((c["VenteDirecte"]?"Vente directe n°":"Commande n°")+ref,body,foot);
+    <button class="btn ${aRegler?'':'primary'}" onclick="newCommande(${ref})">Modifier</button>
+    ${aRegler?`<button class="btn primary" onclick="encaisser(${ref})">Encaisser ${eur(cmdReste(ref))}</button>`:""}`;
+  modal((c["VenteDirecte"]?"Vente directe n°":"Commande n°")+ref+" · "+dayLabel(livISO(c)),body,foot);
 }
 
 async function deleteCommande(ref){
   if(!confirm("Supprimer définitivement la commande n°"+ref+" et ses lignes ?"))return;
   const ls=(CACHE._lignesByCmd[ref]||[]).slice();
+  const cmd=CACHE._cmdById[ref]; // remet en stock ce que la commande avait réservé
+  await stockApply(ls.map(l=>l["StockAlloc"]),[],"Cde n°"+ref+" supprimée"+(cmd?" ("+clientNom(CACHE._cliById[cmd["RéfClient"]])+")":""));
   for(const l of ls) await delOne("lignes",l["RéfDétailCommande"]);
   await delOne("commandes",ref);
   await loadCache(); closeModal(); render(); toast("Commande supprimée");
@@ -640,15 +867,18 @@ async function deleteCommande(ref){
 
 /* ---------- Saisie / édition d'une commande ---------- */
 let draft=null;
+function draftSig(){ return JSON.stringify([draft.client,draft.livraison,draft.heure,String(draft.emp||""),draft.lignes.map(l=>[l.prod,l.libelle||"",+l.qte,+l.pu,l.com||""]),draft.statut||"",+draft.acompte||0]); }
+function draftDirty(){ if(!draft)return false; syncDraftHeader(); return draftSig()!==draft._snap; }
 function newCommande(editRef){
   if(editRef){
     const c=(CACHE.commandes||[]).find(x=>x["RéfCommande"]===editRef);
     draft={ref:editRef, vente:!!c["VenteDirecte"], client:c["RéfClient"], livraison:(c["DateExpédition"]||"").slice(0,10),
       heure:(c["Heure"]||""), emp:c["RéfEmployé"]||"",
-      lignes:(CACHE._lignesByCmd[editRef]||[]).map(l=>({prod:l["RéfProduit"]||0,libelle:l["Libelle"]||"",qte:l["Quantité"]||1,pu:l["PrixUnitaires"]||0,com:l["Commentaire"]||"",ref:l["RéfDétailCommande"]}))};
+      lignes:(CACHE._lignesByCmd[editRef]||[]).map(l=>({prod:l["RéfProduit"]||0,libelle:l["Libelle"]||"",qte:l["Quantité"]||1,pu:l["PrixUnitaires"]||0,com:l["Commentaire"]||"",ref:l["RéfDétailCommande"],alloc:l["StockAlloc"]||null}))};
   }else{
     draft={ref:null,vente:false,client:null,livraison:todayISO(),heure:"",emp:"",lignes:[],statut:"nonpaye",acompte:0,payMode:"cb"};
   }
+  draft._snap=draftSig();
   renderDraft();
 }
 async function ensureComptoir(){
@@ -661,44 +891,60 @@ async function ensureComptoir(){
 async function venteDirecte(){
   const ref=await ensureComptoir();
   draft={ref:null,vente:true,client:ref,livraison:todayISO(),heure:"",emp:"",lignes:[]};
+  draft._snap=draftSig();
   renderDraft();
 }
-function renderDraft(){
+function quickDates(){ // Aujourd'hui, Demain, puis les 4 jours suivants (« Mer. 26 »)
+  const t=todayISO(); const out=[[t,"Aujourd'hui"],[addDaysISO(t,1),"Demain"]];
+  for(let i=2;i<6;i++){ const iso=addDaysISO(t,i); const [y,m,d]=iso.split("-").map(Number);
+    const w=new Date(y,m-1,d).toLocaleDateString("fr-FR",{weekday:"short"}).replace(".","");
+    out.push([iso,w.charAt(0).toUpperCase()+w.slice(1)+" "+d]); }
+  return out;
+}
+function setDraftDate(iso){ const i=document.getElementById("dLiv"); if(i)i.value=iso; draft.livraison=iso; markQuickDate(); }
+function markQuickDate(){ const v=(document.getElementById("dLiv")||{}).value; document.querySelectorAll("#qDates button").forEach(b=>b.classList.toggle("on",b.dataset.d===v)); const l=document.getElementById("dLivLbl"); if(l)l.textContent=v?dayLabel(v):""; }
+function clientBoxHTML(){
   const cl=draft.client?CACHE._cliById[draft.client]:null;
+  if(cl) return `<div class="picked"><div class="who"><b>${esc(clientNom(cl))}</b><small>${esc([cl["NuméroTél"],cl["AdresseFacturation"]].filter(Boolean).join(" · ")||"Pas de coordonnées")}</small></div>
+    <button class="btn sm" type="button" onclick="draftClearClient()">Changer</button></div>`;
+  return `<div class="combo"><input id="cliQ" type="search" autocomplete="off" placeholder="Tapez le nom ou le téléphone du client…" aria-label="Rechercher un client" role="combobox" aria-expanded="false" aria-controls="cliList"><div class="combo-list" id="cliList" role="listbox"></div></div>`;
+}
+function renderDraft(keep){
   const empOpts=(CACHE.employes||[]).map(e=>`<option value="${e["RéfEmployé"]}" ${draft.emp==e["RéfEmployé"]?"selected":""}>${esc(e["NomFamille"])}</option>`).join("");
   const vente=!!draft.vente;
+  const hr=draft.heure?(String(draft.heure).padStart(4,'0').slice(0,2)+':'+String(draft.heure).padStart(4,'0').slice(2,4)):'';
   const body=`
    <div class="grid2" style="margin-bottom:16px">
-     <label class="fld">Client${vente?' <span class="muted" style="font-weight:400">(comptoir par défaut)</span>':''}
+     <div class="fld">Client${vente?' <span class="muted" style="font-weight:400">(comptoir par défaut)</span>':''}
+       <div id="cliBox">${clientBoxHTML()}</div>
+     </div>
+     <div class="fld">${vente?"Date":"Livraison / retrait"} <span id="dLivLbl" style="font-weight:400;color:var(--praline)"></span>
        <div class="row" style="gap:8px">
-         <input id="dCli" type="text" class="grow" readonly value="${esc(cl?clientNom(cl):"")}" placeholder="Aucun client choisi" style="background:#fff">
-         <button class="btn" type="button" onclick="pickClient()">Choisir</button>
+         <input id="dLiv" class="grow" type="date" value="${esc(draft.livraison)}" onchange="markQuickDate()" aria-label="Date">
+         ${vente?"":`<input id="dHr" type="time" value="${hr}" style="max-width:120px" aria-label="Heure">`}
        </div>
-     </label>
-     ${vente?`<label class="fld">Date<input id="dLiv" type="date" value="${esc(draft.livraison)}"></label>`
-     :`<div class="row">
-       <label class="fld grow">Date de livraison<input id="dLiv" type="date" value="${esc(draft.livraison)}"></label>
-       <label class="fld" style="max-width:120px">Heure<input id="dHr" type="time" value="${draft.heure?(String(draft.heure).padStart(4,'0').slice(0,2)+':'+String(draft.heure).padStart(4,'0').slice(2,4)):''}"></label>
-     </div>`}
+       ${vente?"":`<div class="quick" id="qDates">${quickDates().map(([d,l])=>`<button type="button" data-d="${d}" onclick="setDraftDate('${d}')">${esc(l)}</button>`).join("")}</div>`}
+     </div>
    </div>
-   <label class="fld" style="margin-bottom:14px">Vendeuse / prise par
-     <select id="dEmp" style="max-width:240px"><option value="">—</option>${empOpts}</select></label>
+   ${empOpts?`<label class="fld" style="margin-bottom:14px">Prise par
+     <select id="dEmp" style="max-width:240px"><option value="">—</option>${empOpts}</select></label>`:""}
 
    <div class="card pad" style="background:#fff;margin-bottom:14px">
-     <div class="row" style="align-items:center;margin-bottom:8px">
-       <b class="grow">Articles</b>
-       <button class="btn sm" type="button" onclick="addFreeLine()">+ Produit supplémentaire</button>
-       <button class="btn sm primary" type="button" onclick="pickProduct()">+ Ajouter un produit</button>
+     <div class="row" style="align-items:center;margin-bottom:10px;gap:8px">
+       <div class="combo grow" style="min-width:220px">
+         <input id="prodQ" type="search" autocomplete="off" placeholder="Ajouter un produit : tapez son nom, puis Entrée…" aria-label="Ajouter un produit" role="combobox" aria-expanded="false" aria-controls="prodList">
+         <div class="combo-list" id="prodList" role="listbox"></div>
+       </div>
+       <button class="btn sm" type="button" onclick="addFreeLine()" title="Article hors catalogue, libellé et prix libres">+ Article libre</button>
      </div>
-     <table class="lignes"><thead><tr><th>Produit</th><th class="right">Qté</th><th class="right">Prix unit.</th><th class="right">Total</th><th></th></tr></thead>
+     <div class="tbl"><table class="lignes"><thead><tr><th>Article</th><th class="right">Qté</th><th class="right hide-sm">Prix unit.</th><th class="right">Total</th><th></th></tr></thead>
      <tbody id="dLignes"></tbody>
-     <tfoot><tr><td colspan="3" class="right"><b>Total</b></td><td class="right ttot" id="dTotal"></td><td></td></tr></tfoot></table>
-     <datalist id="commentsDL">${allComments().map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+     <tfoot><tr><td colspan="2" class="right hide-sm"></td><td class="right"><b>Total</b></td><td class="right ttot" id="dTotal"></td><td></td></tr></tfoot></table></div>
      ${Object.keys(CACHE._comByCat||{}).map(cr=>`<datalist id="cdl_${cr}">${(CACHE._comByCat[cr]||[]).map(c=>`<option value="${esc(c)}">`).join("")}</datalist>`).join("")}
    </div>
    ${vente?"":(draft.ref
      ? `<div class="card pad" style="background:#fff;margin-bottom:14px"><b>Règlement</b> ${statutChip(draft.ref)}
-         <div class="muted" style="font-size:13px;margin-top:6px">Pour encaisser ou ajouter un acompte, utilisez l'écran Caisse.</div></div>`
+         <div class="muted" style="font-size:13px;margin-top:6px">Pour encaisser ou ajouter un acompte, utilisez le bouton « Encaisser » de la commande ou l'écran Caisse.</div></div>`
      : `<div class="card pad" style="background:#fff;margin-bottom:14px">
          <b>Règlement</b>
          <div class="print-actions" style="margin-top:6px">
@@ -706,7 +952,7 @@ function renderDraft(){
            <button type="button" class="catchip" id="st_acompte" onclick="pickStatut('acompte')">Acompte</button>
            <button type="button" class="catchip" id="st_paye" onclick="pickStatut('paye')">Payée</button>
          </div>
-         <div id="acompteWrap" style="display:none;margin-top:10px"><label class="fld" style="max-width:220px">Montant de l'acompte (€)<input id="dAcompte" type="number" step="0.01" min="0" value="${draft.acompte||""}" onchange="draft.acompte=parseFloat(this.value)||0"></label></div>
+         <div id="acompteWrap" style="display:none;margin-top:10px"><label class="fld" style="max-width:220px">Montant de l'acompte (€)<input id="dAcompte" type="number" step="0.01" min="0" value="${draft.acompte||""}" oninput="draft.acompte=parseFloat(this.value)||0;renderDraftLignes()"></label></div>
          <div id="payModeWrap" style="display:none;margin-top:10px"><div class="fld">Moyen de paiement</div>
            <div class="print-actions" style="margin-top:4px">
              <button type="button" class="catchip" id="pm_cheque" onclick="pickPayMode('cheque')">Chèque</button>
@@ -714,44 +960,59 @@ function renderDraft(){
              <button type="button" class="catchip" id="pm_cb" onclick="pickPayMode('cb')">CB</button>
            </div></div>
        </div>`)}`;
+  const totalHTML=`<span class="foot-total">Total <b id="dTotal2"></b> <span id="dReste" style="font-size:13px"></span></span>`;
   const foot= vente
-    ? `<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="saveVente()">Encaisser la vente</button>`
-    : `<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="saveCommande()">${draft.ref?"Enregistrer les modifications":"Créer la commande"}</button>`;
+    ? `${totalHTML}<button class="btn" onclick="tryCloseModal()">Annuler</button><button class="btn primary" onclick="saveVente()" title="Ctrl + Entrée">Encaisser la vente</button>`
+    : `${totalHTML}<button class="btn" onclick="tryCloseModal()">Annuler</button><button class="btn primary" onclick="saveCommande()" title="Ctrl + Entrée">${draft.ref?"Enregistrer les modifications":"Créer la commande"}</button>`;
   const titre= vente ? "Vente directe (comptoir)" : (draft.ref?("Modifier la commande n°"+draft.ref):"Nouvelle commande");
-  modal(titre,body,foot);
-  renderDraftLignes();
+  // à l'ouverture : on part du client s'il manque, sinon de la recherche produit
+  modal(titre,body,foot,{guard:draftDirty,keepScroll:!!keep,focus:keep?null:(draft.client?"#prodQ":"#cliQ")});
+  renderDraftLignes(); markQuickDate(); wireProdCombo(); wireCliCombo();
   if(!vente && !draft.ref){ pickStatut(draft.statut||"nonpaye"); pickPayMode(draft.payMode||"cb"); }
 }
 function pickStatut(s){
   draft.statut=s;
-  ["nonpaye","acompte","paye"].forEach(x=>{const b=document.getElementById("st_"+x); if(b)b.classList.toggle("on",x===s);});
+  ["nonpaye","acompte","paye"].forEach(x=>{const b=document.getElementById("st_"+x); if(b){b.classList.toggle("on",x===s);b.setAttribute("aria-pressed",x===s);}});
   const aw=document.getElementById("acompteWrap"); if(aw)aw.style.display=(s==="acompte")?"block":"none";
   const pw=document.getElementById("payModeWrap"); if(pw)pw.style.display=(s==="acompte"||s==="paye")?"block":"none";
+  if(s==="acompte"){ const a=document.getElementById("dAcompte"); if(a&&!a.value)setTimeout(()=>a.focus(),0); }
+  renderDraftTotals();
 }
-function pickPayMode(k){ draft.payMode=k; ["cheque","espece","cb"].forEach(x=>{const b=document.getElementById("pm_"+x); if(b)b.classList.toggle("on",x===k);}); }
+function pickPayMode(k){ draft.payMode=k; ["cheque","espece","cb"].forEach(x=>{const b=document.getElementById("pm_"+x); if(b){b.classList.toggle("on",x===k);b.setAttribute("aria-pressed",x===k);}}); }
+function draftTotal(){ return draft.lignes.reduce((s,l)=>s+(Number(l.qte)||0)*(Number(l.pu)||0),0); }
+function renderDraftTotals(){
+  const tot=draftTotal();
+  const a=document.getElementById("dTotal"), b=document.getElementById("dTotal2"), r=document.getElementById("dReste");
+  if(a)a.textContent=eur(tot); if(b)b.textContent=eur(tot);
+  if(r) r.textContent=(!draft.vente&&!draft.ref&&draft.statut==="acompte"&&draft.acompte>0)?"· reste "+eur(Math.max(0,tot-draft.acompte)):"";
+}
 function renderDraftLignes(){
   const tb=document.getElementById("dLignes"); if(!tb)return;
-  if(!draft.lignes.length){tb.innerHTML=`<tr><td colspan="5" class="muted" style="text-align:center;padding:18px">Aucun article. Ajoutez un produit ou un produit supplémentaire.</td></tr>`;}
-  else tb.innerHTML=draft.lignes.map((l,i)=>{
+  if(!draft.lignes.length){tb.innerHTML=`<tr><td colspan="5" class="muted" style="text-align:center;padding:22px">Aucun article pour l'instant.<br><span style="font-size:13px">Tapez le nom d'un produit dans le champ ci-dessus.</span></td></tr>`;}
+  const notes=draft.lignes.length?draftStockNotes():[];
+  if(draft.lignes.length) tb.innerHTML=draft.lignes.map((l,i)=>{
     const p=CACHE._prodById[l.prod];
     const t=(Number(l.qte)||0)*(Number(l.pu)||0);
     const nameCell = p
-      ? esc(p["NomProduit"])
-      : `<input type="text" value="${esc(l.libelle||"Produit(s) supplémentaire(s)")}" onchange="updLigneText(${i},'libelle',this.value)" style="width:100%" placeholder="Libellé">`;
-    return `<tr><td>${nameCell}
-        <input list="cdl_${catRefOf(l.prod)}" value="${esc(l.com||"")}" onchange="updLigneText(${i},'com',this.value)" placeholder="Commentaire (ex. sans fromage)" style="width:100%;margin-top:4px;font-size:13px;color:var(--praline)"></td>
-      <td class="right"><input type="number" min="0" step="0.5" value="${l.qte}" onchange="updLigne(${i},'qte',this.value)"></td>
-      <td class="right"><input type="number" min="0" step="0.01" value="${l.pu}" onchange="updLigne(${i},'pu',this.value)"></td>
-      <td class="right nowrap"><b>${eur(t)}</b></td>
-      <td><button class="btn ghost sm" title="Retirer" onclick="rmLigne(${i})">✕</button></td></tr>`;
+      ? `<b>${esc(p["NomProduit"])}</b>`
+      : `<input type="text" value="${esc(l.libelle||"Produit(s) supplémentaire(s)")}" onchange="updLigneText(${i},'libelle',this.value)" style="width:100%" placeholder="Libellé" aria-label="Libellé de l'article libre">`;
+    return `<tr style="cursor:default"><td style="min-width:200px">${nameCell}<div id="sn_${i}">${notes[i]||""}</div>
+        <input list="cdl_${catRefOf(l.prod)}" value="${esc(l.com||"")}" onchange="updLigneText(${i},'com',this.value)" placeholder="+ commentaire (ex. sans fromage)" aria-label="Commentaire" style="width:100%;margin-top:4px;font-size:13px;color:var(--praline);padding:6px 10px"></td>
+      <td class="right"><div class="qty"><button type="button" aria-label="Diminuer" onclick="stepQte(${i},-1)">−</button><input type="number" min="0" step="0.5" value="${l.qte}" aria-label="Quantité" oninput="updLigne(${i},'qte',this.value)" onfocus="this.select()"><button type="button" aria-label="Augmenter" onclick="stepQte(${i},1)">+</button></div></td>
+      <td class="right hide-sm"><input type="number" min="0" step="0.01" value="${l.pu}" aria-label="Prix unitaire" oninput="updLigne(${i},'pu',this.value)" onfocus="this.select()"></td>
+      <td class="right nowrap"><b id="lt_${i}">${eur(t)}</b></td>
+      <td><button class="btn ghost sm" title="Retirer cet article" aria-label="Retirer cet article" onclick="rmLigne(${i})">✕</button></td></tr>`;
   }).join("");
-  const tot=draft.lignes.reduce((s,l)=>s+(Number(l.qte)||0)*(Number(l.pu)||0),0);
-  document.getElementById("dTotal").textContent=eur(tot);
+  renderDraftTotals();
 }
-function addFreeLine(){ syncDraftHeader(); draft.lignes.push({prod:0,libelle:"Produit(s) supplémentaire(s)",qte:1,pu:0,com:"",ref:null}); renderDraft(); }
+function addFreeLine(){ syncDraftHeader(); draft.lignes.push({prod:0,libelle:"Produit(s) supplémentaire(s)",qte:1,pu:0,com:"",ref:null}); renderDraftLignes();
+  const ins=document.querySelectorAll("#dLignes input[type=text]"); const last=ins[ins.length-1]; if(last){last.focus();last.select();} }
 function updLigneText(i,k,v){ draft.lignes[i][k]=v; if(k==="com"){const t=(v||"").trim(); if(t)addComToLib(catRefOf(draft.lignes[i].prod),t);} }
-function updLigne(i,k,v){draft.lignes[i][k]=parseFloat(v)||0;renderDraftLignes();}
-function rmLigne(i){draft.lignes.splice(i,1);renderDraftLignes();}
+// mise à jour en direct (sans redessiner la ligne : le curseur reste dans le champ)
+function updLigne(i,k,v){ draft.lignes[i][k]=parseFloat(String(v).replace(",","."))||0; const l=draft.lignes[i];
+  const c=document.getElementById("lt_"+i); if(c)c.textContent=eur((Number(l.qte)||0)*(Number(l.pu)||0)); renderDraftTotals(); if(k==="qte")refreshStockNotes(); }
+function stepQte(i,d){ const l=draft.lignes[i]; let q=Number(l.qte)||0; q=q+d; if(q<1)q=d<0?Math.min(Number(l.qte)||1,1):1; l.qte=q; renderDraftLignes(); }
+function rmLigne(i){ const l=draft.lignes[i]; draft.lignes.splice(i,1); renderDraftLignes(); toastUndo("Article retiré",()=>{draft.lignes.splice(i,0,l);renderDraftLignes();}); }
 function syncDraftHeader(){
   const liv=document.getElementById("dLiv"), hr=document.getElementById("dHr"), emp=document.getElementById("dEmp");
   if(liv)draft.livraison=liv.value;
@@ -759,59 +1020,96 @@ function syncDraftHeader(){
   if(emp)draft.emp=emp.value;
 }
 
-/* sélecteur de client (réutilise la modale en mode liste) */
-function pickClient(){
-  syncDraftHeader();
-  const body=`<div class="search" style="margin-bottom:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-     <input id="pcq" type="search" placeholder="Nom du client…" style="width:100%;padding-left:38px" autofocus></div>
-     <div style="margin-bottom:10px"><button class="btn sm" onclick="quickNewClient()">+ Nouveau client</button></div>
-     <div id="pcList" style="max-height:46vh;overflow:auto"></div>`;
-  modal("Choisir un client",body,`<button class="btn" onclick="renderDraft()">Retour</button>`);
-  const q=document.getElementById("pcq");
-  const run=()=>{
-    const s=q.value.trim().toLowerCase();
-    let list=(CACHE.clients||[]);
-    if(s)list=list.filter(c=>clientNom(c).toLowerCase().includes(s)); else list=list.slice(0,0);
-    list=list.slice(0,60);
-    document.getElementById("pcList").innerHTML=list.length?`<table><tbody>${list.map(c=>
-      `<tr onclick="chooseClient(${c["RéfClient"]})"><td><b>${esc(clientNom(c))}</b><div class="muted" style="font-size:13px">${esc(c["AdresseFacturation"]||"")} ${esc(c["NuméroTél"]||"")}</div></td></tr>`).join("")}</tbody></table>`
-      :`<div class="muted" style="padding:14px">${s?"Aucun client. Créez-en un nouveau.":"Tapez un nom pour rechercher."}</div>`;
+/* ---------- Listes déroulantes de recherche (client, produit) ---------- */
+function closeCombos(){ document.querySelectorAll(".combo-list.open").forEach(l=>{l.classList.remove("open"); const i=l.parentNode.querySelector("input"); if(i)i.setAttribute("aria-expanded","false");}); }
+// items : [{html, pick:fn, cls}] ; le premier est présélectionné, ↑ ↓ pour naviguer, Entrée pour choisir
+function combo(input,list,source){
+  let items=[], hl=0;
+  const draw=()=>{
+    items=source(input.value);
+    list.innerHTML=items.map((it,k)=>it.head?`<div class="muted" style="padding:7px 12px 3px;font-size:12px;text-transform:uppercase;letter-spacing:.5px">${it.head}</div>`
+      :`<div class="combo-opt ${it.cls||""} ${k===hl?"hl":""}" role="option" data-k="${k}">${it.html}</div>`).join("");
+    const has=items.some(it=>!it.head); list.classList.toggle("open",has); input.setAttribute("aria-expanded",has);
   };
-  q.addEventListener("input",run); run();
+  const first=()=>items.findIndex(it=>!it.head);
+  const move=d=>{ if(!items.length)return; let k=hl; do{ k=(k+d+items.length)%items.length; }while(items[k].head&&k!==hl); hl=k; draw();
+    const el=list.querySelector(".hl"); if(el)el.scrollIntoView({block:"nearest"}); };
+  input.addEventListener("input",()=>{ items=source(input.value); hl=Math.max(0,first()); draw(); });
+  input.addEventListener("focus",()=>{ if(input._quiet){input._quiet=false;return;} items=source(input.value); hl=Math.max(0,first()); draw(); });
+  input.addEventListener("blur",()=>setTimeout(()=>{ list.classList.remove("open"); input.setAttribute("aria-expanded","false"); },150));
+  input.addEventListener("keydown",e=>{
+    if(e.key==="ArrowDown"){e.preventDefault(); if(!list.classList.contains("open"))draw(); else move(1);}
+    else if(e.key==="ArrowUp"){e.preventDefault(); move(-1);}
+    else if(e.key==="Enter"&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); const it=items[hl]; if(it&&!it.head&&list.classList.contains("open"))it.pick(); }
+  });
+  list.addEventListener("mousedown",e=>{ e.preventDefault(); const o=e.target.closest(".combo-opt"); if(o){ const it=items[+o.dataset.k]; if(it)it.pick(); } });
 }
-function chooseClient(ref){draft.client=ref;renderDraft();}
-async function quickNewClient(){
-  const nom=prompt("Nom du nouveau client :"); if(!nom)return;
+function matchAll(text,q){ const t=norm(text); return norm(q).split(/\s+/).filter(Boolean).every(w=>t.includes(w)); }
+function prodFreq(){ // produits les plus commandés, calculé une fois
+  if(CACHE._prodFreq)return CACHE._prodFreq; const f={};
+  (CACHE.lignes||[]).forEach(l=>{const r=l["RéfProduit"]; if(r)f[r]=(f[r]||0)+1;}); return CACHE._prodFreq=f;
+}
+function wireProdCombo(){
+  const pq=document.getElementById("prodQ"), pl=document.getElementById("prodList");
+  if(pq) combo(pq,pl,q=>{
+    const f=prodFreq(); const s=q.trim(); let list=CACHE.produits||[];
+    const opt=p=>{const cat=CACHE._catById[p["RéfCatégorie"]];
+      return {html:`<span class="grow"><b>${esc(p["NomProduit"])}</b> <span class="chip">${esc(cat?cat["NomCatégorie"]:"")}</span></span><span class="nowrap">${eur(p["PrixUnitaire"])}</span>`,pick:()=>addProduct(p["RéfProduit"])};};
+    if(!s){ const top=list.slice().sort((a,b)=>(f[b["RéfProduit"]]||0)-(f[a["RéfProduit"]]||0)).slice(0,8);
+      return top.length?[{head:"Les plus commandés"}].concat(top.map(opt)):[]; }
+    const ns=norm(s);
+    list=list.filter(p=>matchAll(p["NomProduit"],s)).sort((a,b)=>{
+      const sa=norm(a["NomProduit"]).startsWith(ns)?0:1, sb=norm(b["NomProduit"]).startsWith(ns)?0:1;
+      return sa-sb||(f[b["RéfProduit"]]||0)-(f[a["RéfProduit"]]||0); }).slice(0,30);
+    const out=list.map(opt);
+    out.push({cls:"create",html:`+ Article libre « ${esc(s)} »`,pick:()=>{ syncDraftHeader(); draft.lignes.push({prod:0,libelle:s,qte:1,pu:0,com:"",ref:null}); pq.value=""; closeCombos(); renderDraftLignes();
+      const pus=document.querySelectorAll('#dLignes input[aria-label="Prix unitaire"]'); const last=pus[pus.length-1]; if(last)last.focus(); }});
+    return out;
+  });
+}
+function wireCliCombo(){
+  const cq=document.getElementById("cliQ"), cl=document.getElementById("cliList");
+  if(cq) combo(cq,cl,q=>{
+    const s=q.trim(); if(!s)return [];
+    const digits=s.replace(/\D/g,"");
+    const list=(CACHE.clients||[]).filter(c=>matchAll(clientNom(c),s)||(digits.length>=4&&String(c["NuméroTél"]||"").replace(/\D/g,"").includes(digits)))
+      .sort((a,b)=>clientNom(a).localeCompare(clientNom(b),"fr")).slice(0,30);
+    const out=list.map(c=>({html:`<span class="grow"><b>${esc(clientNom(c))}</b><div class="sub">${esc([c["NuméroTél"],c["AdresseFacturation"]].filter(Boolean).join(" · "))}</div></span>`,pick:()=>chooseClient(c["RéfClient"])}));
+    out.push({cls:"create",html:`+ Nouveau client « ${esc(s)} »`,pick:()=>newClientInline(s)});
+    return out;
+  });
+}
+function chooseClient(ref){ syncDraftHeader(); draft.client=ref; document.getElementById("cliBox").innerHTML=clientBoxHTML(); closeCombos();
+  const p=document.getElementById("prodQ"); if(p){p._quiet=true;p.focus();} }
+function resetCliBox(){ document.getElementById("cliBox").innerHTML=clientBoxHTML(); wireCliCombo(); const cq=document.getElementById("cliQ"); if(cq)cq.focus(); }
+function draftClearClient(){ draft.client=null; resetCliBox(); }
+// Création d'un client sans quitter la commande (remplace l'ancienne fenêtre « prompt »)
+function newClientInline(nom){
+  closeCombos();
+  document.getElementById("cliBox").innerHTML=`<div class="card pad" style="background:#fff;padding:12px">
+    <div class="grid2" style="gap:8px"><input id="ncNom" type="text" value="${esc(nom||"")}" placeholder="Nom" aria-label="Nom du nouveau client">
+    <input id="ncTel" type="tel" placeholder="Téléphone" aria-label="Téléphone"></div>
+    <div class="row" style="gap:8px;margin-top:8px;justify-content:flex-end">
+      <button class="btn sm" type="button" onclick="resetCliBox()">Annuler</button>
+      <button class="btn sm primary" type="button" onclick="saveClientInline()">Créer le client</button></div></div>`;
+  const t=document.getElementById("ncTel"); t.focus();
+  ["ncNom","ncTel"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveClientInline();}}));
+}
+async function saveClientInline(){
+  const nom=document.getElementById("ncNom").value.trim(), tel=document.getElementById("ncTel").value.trim();
+  if(!nom){toast("Indiquez un nom",true);return;}
+  syncDraftHeader();
   const ref=nextId("clients","RéfClient");
-  const c={"RéfClient":ref,"NomSociété":nom};
-  await putOne("clients",c); await loadCache();
-  draft.client=ref; toast("Client créé"); renderDraft();
-}
-
-/* sélecteur de produit */
-function pickProduct(){
-  syncDraftHeader();
-  const body=`<div class="search" style="margin-bottom:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-     <input id="ppq" type="search" placeholder="Nom du produit…" style="width:100%;padding-left:38px" autofocus></div>
-     <div id="ppList" style="max-height:50vh;overflow:auto"></div>`;
-  modal("Ajouter un produit",body,`<button class="btn" onclick="renderDraft()">Retour</button>`);
-  const q=document.getElementById("ppq");
-  const run=()=>{
-    const s=q.value.trim().toLowerCase();
-    let list=(CACHE.produits||[]);
-    if(s)list=list.filter(p=>(p["NomProduit"]||"").toLowerCase().includes(s));
-    list=list.slice(0,80);
-    document.getElementById("ppList").innerHTML=`<table><tbody>${list.map(p=>{
-      const cat=CACHE._catById[p["RéfCatégorie"]];
-      return `<tr onclick="addProduct(${p["RéfProduit"]})"><td><b>${esc(p["NomProduit"])}</b> <span class="chip">${esc(cat?cat["NomCatégorie"]:"")}</span></td><td class="right nowrap">${eur(p["PrixUnitaire"])}</td></tr>`;
-    }).join("")}</tbody></table>`;
-  };
-  q.addEventListener("input",run); run();
+  await putOne("clients",{"RéfClient":ref,"NomSociété":nom,"NuméroTél":tel||null}); await loadCache();
+  toast("Client créé ✓"); chooseClient(ref);
 }
 function addProduct(ref){
-  const p=CACHE._prodById[ref];
-  draft.lignes.push({prod:ref,qte:1,pu:Number(p["PrixUnitaire"])||0,com:"",ref:null});
-  renderDraft();
+  const p=CACHE._prodById[ref]; syncDraftHeader();
+  const same=draft.lignes.find(l=>l.prod===ref&&!(l.com||"").trim());
+  if(same){ same.qte=(Number(same.qte)||0)+1; toast(p["NomProduit"]+" : quantité "+same.qte); }
+  else draft.lignes.push({prod:ref,qte:1,pu:Number(p["PrixUnitaire"])||0,com:"",ref:null});
+  renderDraftLignes();
+  const q=document.getElementById("prodQ"); if(q){ q.value=""; closeCombos(); q._quiet=true; q.focus(); }
 }
 
 async function persistDraft(){
@@ -828,12 +1126,16 @@ async function persistDraft(){
   if(draft.vente) obj["VenteDirecte"]=true;
   await putOne("commandes",obj);
   const old=(CACHE._lignesByCmd[ref]||[]).slice();
+  // stock : rend ce qui n'est plus commandé, prend ce qui est nouveau (découpe si besoin)
+  const allocs=await stockApply(old.map(l=>l["StockAlloc"]),draft.lignes,"Cde n°"+ref+" "+clientNom(CACHE._cliById[draft.client]));
+  draft._manques=allocs.filter(a=>a&&a.manque&&a.manque.length);
   for(const l of old) await delOne("lignes",l["RéfDétailCommande"]);
   let lid=nextId("lignes","RéfDétailCommande");
-  for(const l of draft.lignes){
+  for(const [i,l] of draft.lignes.entries()){
     const rec={"RéfDétailCommande":lid++,"RéfCommande":ref,"RéfProduit":l.prod||0,
       "Quantité":Number(l.qte)||0,"PrixUnitaires":Number(l.pu)||0,"Remise":0,"Commentaire":l.com||null};
     if(!l.prod) rec["Libelle"]=l.libelle||"Produit(s) supplémentaire(s)";
+    if(allocs[i]) rec["StockAlloc"]=allocs[i];
     await putOne("lignes",rec);
   }
   await loadCache();
@@ -857,7 +1159,9 @@ async function saveCommande(){
       await loadCache();
     }
   }
-  closeModal(); render(); toast("Commande enregistrée ✓");
+  closeModal(); render();
+  if(draft._manques&&draft._manques.length) toast("Commande enregistrée — attention, stock insuffisant : "+draft._manques.map(a=>(CACHE._stockById[a.art]||{}).nom+" (manque "+persList(a.manque)+")").join(" ; "),true);
+  else toast("Commande enregistrée ✓");
 }
 async function saveVente(){
   syncDraftHeader();
@@ -1003,7 +1307,7 @@ function viewCaisse(){
   // colonne gauche : en attente (filtrable par nom)
   const q=caisseQ.trim().toLowerCase();
   let attente=(CACHE.commandes||[]).filter(c=>!c["Soldee"] && (CACHE._lignesByCmd[c["RéfCommande"]]||[]).length && cmdReste(c["RéfCommande"])>0.005);
-  if(q) attente=attente.filter(c=>clientNom(CACHE._cliById[c["RéfClient"]]).toLowerCase().includes(q));
+  if(q) attente=attente.filter(c=>matchAll(clientNom(CACHE._cliById[c["RéfClient"]]),q));
   attente.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
   const nbAtt=attente.length; const totalDu=attente.reduce((s,c)=>s+cmdReste(c["RéfCommande"]),0);
   const showAtt=attente.slice(0,300);
@@ -1042,7 +1346,7 @@ function viewCaisse(){
 function renderCaisseAttente(){
   const q=caisseQ.trim().toLowerCase();
   let attente=(CACHE.commandes||[]).filter(c=>!c["Soldee"] && (CACHE._lignesByCmd[c["RéfCommande"]]||[]).length && cmdReste(c["RéfCommande"])>0.005);
-  if(q) attente=attente.filter(c=>clientNom(CACHE._cliById[c["RéfClient"]]).toLowerCase().includes(q));
+  if(q) attente=attente.filter(c=>matchAll(clientNom(CACHE._cliById[c["RéfClient"]]),q));
   attente.sort((a,b)=>(a["DateExpédition"]||"").localeCompare(b["DateExpédition"]||""));
   const nbAtt=attente.length; const totalDu=attente.reduce((s,c)=>s+cmdReste(c["RéfCommande"]),0);
   const pages=Math.max(1,Math.ceil(nbAtt/CAISSE_PAGE_SIZE));
@@ -1148,7 +1452,7 @@ function renderFactList(){
   const s=factQ.trim().toLowerCase();
   let list=(CACHE.documents||[]).slice();
   if(factType)list=list.filter(d=>d.type===factType);
-  if(s)list=list.filter(d=>(d.num||"").toLowerCase().includes(s)||clientNom(CACHE._cliById[d.refClient]).toLowerCase().includes(s));
+  if(s)list=list.filter(d=>(d.num||"").toLowerCase().includes(s)||matchAll(clientNom(CACHE._cliById[d.refClient]),s));
   list.sort((a,b)=>(b.date||"").localeCompare(a.date||"")||b.id-a.id);
   const total=list.length;
   const pages=Math.max(1,Math.ceil(total/FACT_PAGE_SIZE));
@@ -1244,34 +1548,35 @@ function printHeaderHTML(sub){
     <div class="right">${esc(sub)}</div></div>`;
 }
 
-/* --- Bon de fabrication labo --- */
+/* --- Bon de fabrication labo ---
+   Par catégorie, puis par produit : une ligne « produit + total » bien visible,
+   et dessous une ligne par commande (heure, client, particularités, quantité). */
 function printLabo(date){
   const cmds=cmdsOfDate(date);
-  const agg={}; // par produit : total + détail par commentaire
+  const agg={};
   cmds.forEach(c=>(CACHE._lignesByCmd[c["RéfCommande"]]||[]).forEach(l=>{
     const rp=l["RéfProduit"]; const catRef=catRefOf(rp); if(!catOn(catRef))return;
-    const com=(l["Commentaire"]||"").trim();
     const key=rp?rp:("L:"+(l["Libelle"]||"supp"));
-    agg[key]=agg[key]||{nom:ligneNom(l),cat:catNomOf(catRef),qte:0,variants:{}};
+    agg[key]=agg[key]||{nom:ligneNom(l),cat:catNomOf(catRef),qte:0,det:[]};
     const q=Number(l["Quantité"])||0;
     agg[key].qte+=q;
-    if(com) agg[key].variants[com]=(agg[key].variants[com]||0)+q;
+    agg[key].det.push({hr:c["Heure"]||"",client:clientNom(CACHE._cliById[c["RéfClient"]]),ref:c["RéfCommande"],
+      com:(l["Commentaire"]||"").trim(),q,coupe:stockNote(l)});
   }));
   const parCat={}; Object.values(agg).forEach(a=>{(parCat[a.cat]=parCat[a.cat]||[]).push(a);});
   const cats=Object.keys(parCat).sort((a,b)=>a.localeCompare(b,"fr"));
-  const r2=x=>Math.round(x*100)/100;
+  const r2=x=>(Math.round(x*100)/100).toLocaleString("fr-FR");
   let body=printHeaderHTML("Bon de fabrication — "+frDate(date));
-  body+=`<p style="margin:0 0 10px"><b>${cmds.length}</b> commande(s) pour le <b>${frDate(date)}</b></p>`;
+  body+=`<p style="margin:0 0 6px">${cmds.length} commande(s) pour le <b>${frDate(date)}</b></p>`;
   body+= cats.length? cats.map(cat=>{
     const items=parCat[cat].sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
-    const rows=items.map(it=>{
-      let r=`<tr><td>${esc(it.nom)}</td><td class="right" style="width:90px"><b>${r2(it.qte)}</b></td></tr>`;
-      const vars=Object.entries(it.variants).sort((a,b)=>b[1]-a[1]);
-      vars.forEach(([com,q])=>{ r+=`<tr><td style="padding-left:26px;font-style:italic;color:#555;border-bottom:0">${esc(com)}</td><td class="right" style="font-style:italic;color:#555;border-bottom:0">${r2(q)}</td></tr>`; });
-      return r;
+    return `<h3 class="labo-cat">${esc(cat)}</h3>`+items.map(it=>{
+      const det=it.det.sort((a,b)=>String(a.hr||"9999").localeCompare(String(b.hr||"9999"))||a.client.localeCompare(b.client,"fr"));
+      return `<table class="labo"><tbody>
+        <tr class="labo-prod"><td>${esc(it.nom)}</td><td class="right">${r2(it.qte)}</td></tr>
+        ${det.map(d=>`<tr class="labo-det"><td><span class="labo-hr">${esc(heure(d.hr))||"—"}</span><b>${esc(d.client)}</b>${d.com?` — <i>${esc(d.com)}</i>`:""}${d.coupe?` <span class="labo-coupe">${esc(d.coupe)}</span>`:""}</td><td class="right">${r2(d.q)}</td></tr>`).join("")}
+      </tbody></table>`;
     }).join("");
-    return `<h3 style="margin:14px 0 4px;border-bottom:1px solid var(--line)">${esc(cat)}</h3>
-      <table><tbody>${rows}</tbody></table>`;
   }).join("") : `<p class="muted">Aucun produit pour les catégories sélectionnées.</p>`;
   printModal("Bon de fabrication — "+frDate(date),body,false);
 }
@@ -1362,7 +1667,8 @@ function viewClients(){
 function renderCliList(){
   const s=cliQ.trim().toLowerCase();
   let list=(CACHE.clients||[]);
-  if(s)list=list.filter(c=>clientNom(c).toLowerCase().includes(s));
+  const sd=s.replace(/\D/g,""); // recherche aussi par téléphone (chiffres seuls)
+  if(s)list=list.filter(c=>matchAll(clientNom(c),s)||(sd.length>=4&&String(c["NuméroTél"]||"").replace(/\D/g,"").includes(sd)));
   list=list.slice().sort((a,b)=>clientNom(a).localeCompare(clientNom(b),"fr"));
   const total=list.length;
   const pages=Math.max(1,Math.ceil(total/CLI_PAGE_SIZE));
@@ -1455,7 +1761,7 @@ function viewProduits(){
 function renderProdList(){
   const s=prodQ.trim().toLowerCase();
   let list=(CACHE.produits||[]);
-  if(s)list=list.filter(p=>(p["NomProduit"]||"").toLowerCase().includes(s));
+  if(s)list=list.filter(p=>matchAll(p["NomProduit"],s));
   if(prodCat)list=list.filter(p=>String(p["RéfCatégorie"])===String(prodCat));
   list=list.slice().sort((a,b)=>(a["NomProduit"]||"").localeCompare(b["NomProduit"]||"","fr"));
   const total=list.length;
@@ -1551,6 +1857,8 @@ function editProduit(ref){
     <label class="fld">Prix de vente (€)<input id="pPrix" type="number" step="0.01" min="0" value="${p["PrixUnitaire"]!=null?p["PrixUnitaire"]:""}"></label>
     <label class="fld">TVA (%)<input id="pTva" type="number" step="0.1" value="${p["TVA"]!=null?p["TVA"]:5.5}"></label>
     <label class="fld" style="grid-column:1/-1">Descriptif<input id="pDesc" type="text" value="${esc(p["Descriptif"]||"")}"></label>
+    <label class="fld">Puise dans le stock<select id="pStock"><option value="">— aucun —</option>${(CACHE.stock||[]).slice().sort((a,b)=>(a.nom||"").localeCompare(b.nom||"","fr")).map(a=>`<option value="${a.id}" ${p.StockArt===a.id?"selected":""}>${esc(a.nom)}</option>`).join("")}</select></label>
+    <label class="fld">Pers. par unité<input id="pParts" type="number" min="0" step="0.5" value="${Number(p.StockParts)||""}" placeholder="vide = la quantité est le nb de parts"></label>
    </div>`;
   modal(ref?"Modifier le produit":"Nouveau produit",body,
     `<button class="btn" onclick="closeModal()">Annuler</button>${ref?`<button class="btn danger" onclick="deleteProduit(${ref})">Supprimer</button>`:""}<button class="btn primary" onclick="saveProduit(${ref||'null'})">Enregistrer</button>`);
@@ -1563,12 +1871,256 @@ async function saveProduit(ref){
   base["PrixUnitaire"]=parseFloat(document.getElementById("pPrix").value)||0;
   base["TVA"]=parseFloat(document.getElementById("pTva").value)||0;
   base["Descriptif"]=document.getElementById("pDesc").value.trim()||null;
+  const sa=document.getElementById("pStock").value;
+  if(sa){ base.StockArt=+sa; base.StockParts=parseFloat(document.getElementById("pParts").value)||0; } else { delete base.StockArt; delete base.StockParts; }
   if(!base["NomProduit"]){toast("Indiquez un nom de produit",true);return;}
   await putOne("produits",base); await loadCache(); closeModal(); render(); toast("Produit enregistré ✓");
 }
 async function deleteProduit(ref){
   if(!confirm("Supprimer ce produit ? (les commandes passées ne sont pas modifiées)"))return;
   await delOne("produits",ref); await loadCache(); closeModal(); render(); toast("Produit supprimé");
+}
+
+/* =================================================================
+   STOCK (bûches, entremets… avec découpe automatique)
+   -----------------------------------------------------------------
+   Article de stock : {id, nom, decoupable, pieces:{"12":15,"8":1}, journal:[{d,t}]}
+     pieces = nombre de pièces par taille (en parts / personnes).
+   Produit lié : p.StockArt = id de l'article ;
+     p.StockParts = taille d'une unité (ex. 6 pour « Bûche exotique 6 pers. ») ;
+     vide ou 0 = la quantité saisie EST le nombre de parts (une seule pièce).
+   Ligne de commande : l.StockAlloc = {uid, art, pris:[{n,de}], manque:[n]}
+     n = parts prises, de = taille de la pièce entamée (de > n : il y a eu découpe).
+   Règle de prise : d'abord une pièce de la bonne taille ; sinon on coupe la plus
+   petite pièce plus grande (12 pour 4 → 4 part en commande, 8 revient en stock).
+   ================================================================= */
+const PERS=n=>(+n).toLocaleString("fr-FR")+" pers.";
+function persList(arr){ const c={}; (arr||[]).forEach(n=>c[n]=(c[n]||0)+1); return Object.keys(c).map(Number).sort((a,b)=>b-a).map(n=>(c[n]>1?c[n]+" × ":"")+PERS(n)).join(", "); }
+function stockArtOf(prodRef){ const p=CACHE._prodById[prodRef]; return p&&p.StockArt?CACHE._stockById[p.StockArt]||null:null; }
+function stockNeeds(prodRef,qte){
+  const p=CACHE._prodById[prodRef]; const art=stockArtOf(prodRef); if(!art)return null;
+  const q=Number(qte)||0; if(q<=0)return null;
+  const t=Number(p.StockParts)||0;
+  return {art:art.id, sizes: t>0 ? Array(Math.max(1,Math.round(q))).fill(t) : [q]};
+}
+function piecesTailles(art){ const P=art.pieces||{}; return Object.keys(P).map(Number).filter(n=>P[n]>0).sort((a,b)=>a-b); }
+function piecesTotal(art){ const P=art.pieces||{}; return Object.keys(P).reduce((s,k)=>s+Number(k)*P[k],0); }
+function piecesNb(art){ const P=art.pieces||{}; return Object.values(P).reduce((s,v)=>s+v,0); }
+function decPiece(art,n){ const P=art.pieces; P[n]--; if(P[n]<=0)delete P[n]; }
+function putPiece(art,n){ const P=art.pieces=art.pieces||{}; n=Math.round(n*100)/100; P[n]=(P[n]||0)+1; }
+function takePiece(art,n){
+  art.pieces=art.pieces||{};
+  if(art.pieces[n]>0){ decPiece(art,n); return {n,de:n}; }
+  if(art.decoupable===false) return null;
+  // on coupe la plus petite pièce plus grande, sans laisser de reste trop petit pour être vendu
+  // (ex. reste minimum 4 : pour une 4, on ne coupe pas une 6 en 4 + 2, on prend une 12 → 4 + 8)
+  const min=resteMin(art), plus_=piecesTailles(art).filter(s=>s>n);
+  let plus=plus_.find(s=>s-n>=min); if(plus===undefined) plus=plus_[0]; // à défaut, mieux vaut un petit reste qu'une rupture
+  if(plus===undefined) return null;
+  decPiece(art,plus); putPiece(art,plus-n);
+  return {n,de:plus};
+}
+function resteMin(art){ // réglé sur l'article, sinon la plus petite taille vendue parmi les produits liés
+  if(Number(art.resteMin)>0) return Number(art.resteMin);
+  const t=(CACHE.produits||[]).filter(p=>p.StockArt===art.id&&Number(p.StockParts)>0).map(p=>Number(p.StockParts));
+  return t.length?Math.min(...t):0;
+}
+function stockLog(art,txt){ (art.journal=art.journal||[]).unshift({d:new Date().toISOString(),t:txt}); art.journal=art.journal.slice(0,80); }
+function allocDesc(a){
+  const parts=(a.pris||[]).map(p=>p.de>p.n?`${PERS(p.n)} (✂ ${p.de} → ${p.n} + ${Math.round((p.de-p.n)*100)/100})`:PERS(p.n));
+  if(a.manque&&a.manque.length) parts.push("manque "+persList(a.manque));
+  return parts.join(" · ");
+}
+function allocate(art,sizes,label){
+  const pris=[],manque=[];
+  sizes.slice().sort((a,b)=>b-a).forEach(n=>{ const r=takePiece(art,n); if(r)pris.push(r); else manque.push(n); });
+  const a={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,7),art:art.id,pris,manque};
+  stockLog(art,`${label} : sortie ${allocDesc(a)}`);
+  return a;
+}
+// Retour en stock (commande annulée ou modifiée). Si la découpe peut être « recollée »
+// (le reste de la pièce est toujours là), on reforme la pièce d'origine : 4 + 8 → 12.
+function releaseInto(art,a,label){
+  (a.pris||[]).forEach(p=>{
+    const reste=Math.round((p.de-p.n)*100)/100;
+    if(p.de>p.n && (art.pieces||{})[reste]>0){ decPiece(art,reste); putPiece(art,p.de); }
+    else putPiece(art,p.n);
+  });
+  if((a.pris||[]).length) stockLog(art,`${label} : retour ${(a.pris||[]).map(p=>PERS(p.n)).join(", ")}`);
+}
+function allocReusable(alloc,nd){
+  if(!alloc||!nd||alloc.art!==nd.art||(alloc.manque||[]).length)return false;
+  const a=(alloc.pris||[]).map(p=>p.n).sort((x,y)=>x-y), b=nd.sizes.slice().sort((x,y)=>x-y);
+  return a.length===b.length&&a.every((v,i)=>v===b[i]);
+}
+// Applique au stock une commande (création, modification ou suppression : newLines = []).
+// Renvoie, pour chaque nouvelle ligne, l'allocation à enregistrer (ou null).
+async function stockApply(oldLines,newLines,label){
+  const work={}; const art=id=>{ if(!(id in work)){ const a=CACHE._stockById[id]; work[id]=a?JSON.parse(JSON.stringify(a)):null; } return work[id]; };
+  const keep=new Set();
+  const plan=newLines.map(l=>{ const nd=stockNeeds(l.prod,l.qte); if(!nd)return null;
+    if(allocReusable(l.alloc,nd)){ keep.add(l.alloc.uid); return l.alloc; } return {nd}; });
+  oldLines.forEach(a=>{ if(a&&!keep.has(a.uid)){ const ar=art(a.art); if(ar)releaseInto(ar,a,label); } });
+  const res=plan.map(x=>x&&x.nd?allocate(art(x.nd.art),x.nd.sizes,label):x);
+  for(const a of Object.values(work)) if(a) await putOne("stock",a);
+  return res;
+}
+// Note courte pour le bon labo / le détail de commande
+function stockNote(l){
+  const a=l&&l["StockAlloc"]; if(!a)return "";
+  const cut=(a.pris||[]).filter(p=>p.de>p.n).map(p=>`${p.de} → ${p.n}`);
+  const out=[]; if(cut.length)out.push("✂ couper "+cut.join(", "));
+  if((a.manque||[]).length)out.push("⚠ hors stock : "+persList(a.manque));
+  return out.join(" · ");
+}
+// Aperçu dans le formulaire de commande : ce qui va se passer, sans rien enregistrer
+function draftStockNotes(){
+  const work={}; const art=id=>{ if(!(id in work)){ const a=CACHE._stockById[id]; work[id]=a?JSON.parse(JSON.stringify(a)):null; } return work[id]; };
+  const nds=draft.lignes.map(l=>stockNeeds(l.prod,l.qte));
+  const keep=new Set(draft.lignes.map((l,i)=>allocReusable(l.alloc,nds[i])?l.alloc.uid:null).filter(Boolean));
+  draft.lignes.forEach(l=>{ if(l.alloc&&!keep.has(l.alloc.uid)){ const ar=art(l.alloc.art); if(ar)releaseInto(ar,l.alloc,""); } });
+  return draft.lignes.map((l,i)=>{
+    const nd=nds[i]; if(!nd)return "";
+    const ar=art(nd.art);
+    if(keep.has(l.alloc&&l.alloc.uid)) return `<div class="stocknote ok">✓ Réservé en stock : ${esc(allocDesc(l.alloc))}</div>`;
+    const a=allocate(ar,nd.sizes,"");
+    const reste=` — il restera ${piecesNb(ar)} pièce(s), ${PERS(piecesTotal(ar))}`;
+    if(a.manque.length) return `<div class="stocknote warn">⚠ ${esc(ar.nom)} : stock insuffisant (manque ${esc(persList(a.manque))})</div>`;
+    const cut=a.pris.some(p=>p.de>p.n);
+    return `<div class="stocknote ${cut?'info':'ok'}">${cut?"✂":"✓"} ${esc(ar.nom)} : ${esc(allocDesc(a))}${esc(reste)}</div>`;
+  });
+}
+function refreshStockNotes(){ const notes=draftStockNotes(); notes.forEach((h,i)=>{ const el=document.getElementById("sn_"+i); if(el)el.innerHTML=h; }); }
+
+/* ---------- Écran Stock ---------- */
+function stockManques(){ // commandes à venir dont un article n'a pas pu être pris en stock
+  const t=todayISO(); const out=[];
+  (CACHE.commandes||[]).filter(c=>livISO(c)>=t).forEach(c=>(CACHE._lignesByCmd[c["RéfCommande"]]||[]).forEach(l=>{
+    const a=l["StockAlloc"]; if(a&&(a.manque||[]).length)out.push({c,l,a});
+  }));
+  return out.sort((x,y)=>livISO(x.c).localeCompare(livISO(y.c)));
+}
+function viewStock(){
+  const m=document.getElementById("main");
+  const arts=(CACHE.stock||[]).slice().sort((a,b)=>(a.nom||"").localeCompare(b.nom||"","fr"));
+  const manques=stockManques();
+  const liés=id=>(CACHE.produits||[]).filter(p=>p.StockArt===id).sort((a,b)=>(a["NomProduit"]||"").localeCompare(b["NomProduit"]||"","fr"));
+  m.innerHTML=`
+   <div class="row" style="align-items:center;margin-bottom:6px"><h1 style="margin:0" class="grow">Stock</h1>${helpBtn('stock')}
+     <button class="btn primary big" onclick="editStockArticle()">+ Nouvel article</button></div>
+   <p class="muted" style="margin-top:0">Chaque commande d'un produit lié retire automatiquement du stock, en coupant une pièce plus grande si besoin.</p>
+   ${manques.length?`<div class="banner danger"><span style="font-size:20px">⚠</span><span class="grow"><b>${manques.length} article(s) commandé(s) hors stock</b> — à produire :
+     ${manques.slice(0,6).map(x=>`<br>${esc(dayLabel(livISO(x.c)))} · ${esc(clientNom(CACHE._cliById[x.c["RéfClient"]]))} · ${esc(ligneNom(x.l))} (${esc(persList(x.a.manque))})`).join("")}</span></div>`:""}
+   ${arts.length?arts.map(a=>{
+     const tailles=piecesTailles(a).sort((x,y)=>y-x); const ps=liés(a.id);
+     return `<div class="card pad stock-card">
+       <div class="row" style="align-items:center;gap:10px">
+         <h3 class="grow">${esc(a.nom)} ${a.decoupable===false?'<span class="chip">non découpable</span>':'<span class="chip soon">découpable</span>'}</h3>
+         <span class="muted">${piecesNb(a)} pièce(s) · <b style="color:var(--choco)">${PERS(piecesTotal(a))}</b></span>
+         <button class="btn sm" onclick="editStockArticle(${a.id})">Modifier</button>
+       </div>
+       <div class="pieces">${tailles.length?tailles.map(t=>`<span class="piece" title="${a.pieces[t]} pièce(s) de ${PERS(t)}">
+           <button class="btn ghost sm" aria-label="Retirer une pièce de ${t}" onclick="stockAdjust(${a.id},${t},-1)">−</button>
+           <span class="t">${esc(PERS(t))}</span><span class="c">× ${a.pieces[t]}</span>
+           <button class="btn ghost sm" aria-label="Ajouter une pièce de ${t}" onclick="stockAdjust(${a.id},${t},1)">+</button></span>`).join("")
+         :'<span class="muted">Stock vide.</span>'}</div>
+       <div class="row" style="align-items:center;gap:8px">
+         <span class="muted">Entrée en stock :</span>
+         <input id="sq_${a.id}" type="number" min="1" step="1" value="1" style="width:70px" aria-label="Nombre de pièces">
+         <span class="muted">pièce(s) de</span>
+         <input id="st_${a.id}" type="number" min="0.5" step="0.5" value="${tailles[0]||12}" style="width:80px" aria-label="Taille en personnes">
+         <span class="muted">pers.</span>
+         <button class="btn sm primary" onclick="stockAddForm(${a.id})">Ajouter</button>
+       </div>
+       <div class="muted" style="font-size:13px;margin-top:10px">${ps.length?"Produits liés : "+ps.map(p=>`<a href="#" onclick="event.preventDefault();editProduit(${p["RéfProduit"]})">${esc(p["NomProduit"])}</a> (${Number(p.StockParts)>0?PERS(p.StockParts)+" / unité":"quantité = nb de parts"})`).join(", ")
+         :`<span style="color:var(--danger)">Aucun produit lié</span> — cliquez sur « Modifier » pour choisir les produits qui puisent dans ce stock.`}</div>
+       ${(a.journal||[]).length?`<details style="margin-top:8px"><summary class="muted" style="cursor:pointer;font-size:13px">Derniers mouvements</summary>
+         <div style="font-size:13px;margin-top:6px">${a.journal.slice(0,15).map(j=>`<div style="padding:3px 0;border-top:1px solid var(--line)"><span class="muted">${new Date(j.d).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</span> — ${esc(j.t)}</div>`).join("")}</div></details>`:""}
+     </div>`;}).join("")
+   :`<div class="card empty"><div class="big">Aucun article en stock</div>Créez par exemple « Bûche Exotique » avec 15 pièces de 12 pers.,<br>puis liez-y les produits « Bûche exotique 4, 6, 8, 12 pers. ».
+      <div style="margin-top:14px"><button class="btn primary" onclick="editStockArticle()">+ Nouvel article</button></div></div>`}`;
+}
+async function stockAdjust(id,taille,d){
+  const a=JSON.parse(JSON.stringify(CACHE._stockById[id])); a.pieces=a.pieces||{};
+  if(d<0){ if(!(a.pieces[taille]>0))return; decPiece(a,taille); stockLog(a,`Retrait manuel : 1 × ${PERS(taille)}`); }
+  else { putPiece(a,taille); stockLog(a,`Entrée manuelle : 1 × ${PERS(taille)}`); }
+  await putOne("stock",a); await loadCache(); viewStock();
+}
+async function stockAddForm(id){
+  const n=parseInt(document.getElementById("sq_"+id).value)||0, t=parseFloat(document.getElementById("st_"+id).value)||0;
+  if(n<1||t<=0){toast("Indiquez un nombre et une taille",true);return;}
+  const a=JSON.parse(JSON.stringify(CACHE._stockById[id])); for(let i=0;i<n;i++)putPiece(a,t);
+  stockLog(a,`Entrée en stock : ${n} × ${PERS(t)}`);
+  await putOne("stock",a); await loadCache(); viewStock(); toast(`${n} × ${PERS(t)} ajouté(s) ✓`);
+}
+// « Bûche exotique 6 pers » → 6 ; « … 12 parts » → 12
+function guessParts(nom){ const m=String(nom||"").match(/(\d+(?:[.,]\d+)?)\s*(?:p\b|p\.|pers|parts?|personnes?)/i); return m?parseFloat(m[1].replace(",",".")):0; }
+let _link=null;
+function editStockArticle(id){
+  const a=id?CACHE._stockById[id]:{nom:"",decoupable:true};
+  _link={};
+  (CACHE.produits||[]).forEach(p=>{ if(id&&p.StockArt===id)_link[p["RéfProduit"]]={on:true,parts:Number(p.StockParts)||0}; });
+  const body=`<div class="grid2">
+     <label class="fld">Nom de l'article<input id="saNom" type="text" value="${esc(a.nom||"")}" placeholder="ex. Bûche Exotique" oninput="if(!this._touched)stockLinkSearch(this.value)"></label>
+     <label class="fld" style="justify-content:flex-end"><span style="display:flex;gap:8px;align-items:center;font-weight:400;color:var(--ink)">
+       <input id="saCut" type="checkbox" ${a.decoupable===false?"":"checked"}> Découpable (une 12 peut devenir 8 + 4)</span></label>
+     <label class="fld">Reste minimum après découpe (pers.)<input id="saMin" type="number" min="0" step="0.5" value="${Number(a.resteMin)||""}" placeholder="auto : plus petite taille vendue"></label>
+   </div>
+   ${id?"":`<div class="row" style="align-items:center;gap:8px;margin-top:12px"><span class="muted">Stock de départ :</span>
+     <input id="saQ" type="number" min="0" step="1" value="0" style="width:70px" aria-label="Nombre de pièces"> <span class="muted">pièce(s) de</span>
+     <input id="saT" type="number" min="0.5" step="0.5" value="12" style="width:80px" aria-label="Taille"> <span class="muted">pers.</span></div>`}
+   <h3 style="margin:18px 0 4px">Produits qui puisent dans ce stock</h3>
+   <p class="muted" style="margin:0 0 8px;font-size:13px">Cochez les produits concernés. « Pers. par unité » : taille prise à chaque unité commandée (ex. 6 pour « Bûche exotique 6 pers. »).
+     Laissez vide si la quantité saisie en commande est directement le nombre de personnes.</p>
+   <div class="search" style="margin-bottom:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a7558" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+     <input id="saQ2" type="search" placeholder="Filtrer les produits…" style="width:100%;padding-left:38px" oninput="stockLinkSearch(this.value,true)"></div>
+   <div id="saList" style="max-height:38vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff"></div>`;
+  modal(id?"Article de stock — "+a.nom:"Nouvel article de stock",body,
+    `${id?`<button class="btn danger" style="margin-right:auto" onclick="deleteStockArticle(${id})">Supprimer</button>`:""}<button class="btn" onclick="closeModal()">Annuler</button><button class="btn primary" onclick="saveStockArticle(${id||'null'})">Enregistrer</button>`,
+    {focus:"#saNom"});
+  window._saId=id||null;
+  stockLinkSearch(id?"":(a.nom||""));
+}
+function stockLinkSearch(q,manual){
+  if(manual){ const n=document.getElementById("saNom"); if(n)n._touched=true; }
+  const host=document.getElementById("saList"); if(!host)return;
+  const s=(q||"").trim();
+  const linked=(CACHE.produits||[]).filter(p=>_link[p["RéfProduit"]]&&_link[p["RéfProduit"]].on);
+  // sans recherche : produits liés + ceux qui ressemblent au nom (mots de 3 lettres ou plus)
+  const words=norm(s).split(/\s+/).filter(w=>w.length>=3);
+  // d'abord les produits qui contiennent tous les mots ; à défaut, au moins un
+  let list=words.length?(CACHE.produits||[]).filter(p=>matchAll(p["NomProduit"],words.join(" "))):[];
+  if(!list.length&&words.length&&!manual) list=(CACHE.produits||[]).filter(p=>words.some(w=>norm(p["NomProduit"]).includes(w)));
+  list=linked.concat(list.filter(p=>!linked.includes(p))).slice(0,80);
+  host.innerHTML=list.length?`<table><tbody>${list.map(p=>{
+    const r=p["RéfProduit"]; const st=_link[r]||{on:false,parts:guessParts(p["NomProduit"])};
+    const other=p.StockArt&&p.StockArt!==window._saId&&CACHE._stockById[p.StockArt];
+    return `<tr style="cursor:default"><td style="width:34px"><input type="checkbox" ${st.on?"checked":""} aria-label="Lier ${esc(p["NomProduit"])}" onchange="_link[${r}]=Object.assign(_link[${r}]||{parts:guessParts(CACHE._prodById[${r}].NomProduit)},{on:this.checked})"></td>
+      <td><b>${esc(p["NomProduit"])}</b>${other?`<div class="muted" style="font-size:12px">actuellement lié à « ${esc(other.nom)} »</div>`:""}</td>
+      <td class="right nowrap"><input type="number" min="0" step="0.5" value="${st.parts||""}" placeholder="—" style="width:70px" aria-label="Personnes par unité"
+        oninput="_link[${r}]=Object.assign(_link[${r}]||{on:false},{parts:parseFloat(this.value)||0})"> <span class="muted">pers./unité</span></td></tr>`;}).join("")}</tbody></table>`
+    :`<div class="muted" style="padding:14px">${s?"Aucun produit trouvé.":"Tapez le nom de l'article ou filtrez pour voir les produits."}</div>`;
+}
+async function saveStockArticle(id){
+  const nom=document.getElementById("saNom").value.trim(); if(!nom){toast("Indiquez un nom",true);return;}
+  const a=id?JSON.parse(JSON.stringify(CACHE._stockById[id])):{id:nextId("stock","id"),pieces:{},journal:[]};
+  a.nom=nom; a.decoupable=document.getElementById("saCut").checked; a.resteMin=parseFloat(document.getElementById("saMin").value)||0;
+  if(!id){ const q=parseInt((document.getElementById("saQ")||{}).value)||0, t=parseFloat((document.getElementById("saT")||{}).value)||0;
+    if(q>0&&t>0){ for(let i=0;i<q;i++)putPiece(a,t); stockLog(a,`Stock de départ : ${q} × ${PERS(t)}`); } }
+  await putOne("stock",a);
+  for(const [r,st] of Object.entries(_link)){
+    const p=CACHE._prodById[r]; if(!p)continue; const b=Object.assign({},p);
+    if(st.on){ b.StockArt=a.id; b.StockParts=st.parts||0; }
+    else if(p.StockArt===a.id){ delete b.StockArt; delete b.StockParts; } else continue;
+    await putOne("produits",b);
+  }
+  await loadCache(); closeModal(); render(); toast("Article de stock enregistré ✓");
+}
+async function deleteStockArticle(id){
+  const a=CACHE._stockById[id]; if(!a)return;
+  if(!confirm(`Supprimer l'article « ${a.nom} » ?\nLes produits liés ne puiseront plus dans le stock. Les commandes ne sont pas modifiées.`))return;
+  for(const p of (CACHE.produits||[]).filter(p=>p.StockArt===id)){ const b=Object.assign({},p); delete b.StockArt; delete b.StockParts; await putOne("produits",b); }
+  await delOne("stock",id); await loadCache(); closeModal(); render(); toast("Article supprimé");
 }
 
 /* ---------- Sauvegarde / restauration ---------- */
@@ -1607,6 +2159,7 @@ async function doBackup(){
   for(const s of ALL_STORES) out[s]=await getAll(s);
   out.documents=await getAll("documents");
   out.commentaires=await getAll("commentaires");
+  out.stock=await getAll("stock");
   const aut=await getAll("_autres"); if(aut.length)out._autres=aut;
   const blob=new Blob([JSON.stringify(out)],{type:"application/json"});
   const a=document.createElement("a");
@@ -1614,7 +2167,8 @@ async function doBackup(){
   a.href=URL.createObjectURL(blob); a.download="Sauvegarde-ALaTentation-"+stamp+".json";
   document.body.appendChild(a); a.click(); a.remove();
   await setMeta("lastBackup",new Date().toLocaleString("fr-FR"));
-  toast("Sauvegarde téléchargée ✓"); viewSauvegarde();
+  LAST_BACKUP=Date.now(); await setMeta("lastBackupTs",LAST_BACKUP); refreshBackupDot();
+  toast("Sauvegarde téléchargée ✓ — copiez-la sur la clé USB"); render();
 }
 async function doRestore(e){
   const f=e.target.files[0]; if(!f)return;
@@ -1632,6 +2186,12 @@ async function doRestore(e){
    ================================================================= */
 async function start(){
   await loadCache();
+  LAST_BACKUP=await getMeta("lastBackupTs");
+  if(!LAST_BACKUP){ // sauvegardes faites avant cette version : on relit la date « jj/mm/aaaa hh:mm:ss »
+    const old=await getMeta("lastBackup"); const m=old&&String(old).match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if(m) LAST_BACKUP=new Date(+m[3],+m[2]-1,+m[1]).getTime();
+  }
+  refreshBackupDot();
   document.getElementById("gate").style.display="none";
   document.getElementById("app").style.display="block";
   VIEW="dash"; render();

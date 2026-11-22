@@ -3,7 +3,7 @@
    Les données (commandes, clients…) ne passent jamais par ici :
    elles vivent dans IndexedDB, sur l'ordinateur ou la tablette. */
 
-const CACHE = "tentation-v1";
+const CACHE = "tentation-v2";
 
 const FICHIERS = [
   "./",
